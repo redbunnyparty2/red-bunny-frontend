@@ -1,0 +1,1109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Bunny - Dating at the Bar</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+            overflow-x: hidden;
+        }
+        
+        /* Header */
+        .app-header {
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            padding: 1rem;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 20px rgba(255, 0, 0, 0.15);
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
+            margin-bottom: 0.5rem;
+        }
+        
+        .logo-bunny {
+            width: 50px;
+            height: 50px;
+            animation: hop 2s ease-in-out infinite;
+        }
+        
+        @keyframes hop {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        
+        .logo-text {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: white;
+            letter-spacing: -0.5px;
+        }
+        
+        .status-bar {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 0.5rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            margin-top: 0.8rem;
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main-content {
+            padding: 1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            padding-bottom: 80px;
+        }
+        
+        .section {
+            display: none;
+        }
+        
+        .section.active {
+            display: block;
+        }
+        
+        /* Cards */
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+        
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 1rem;
+            background: #FF0000;
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #CC0000;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 0, 0, 0.1);
+            color: #FF0000;
+        }
+        
+        /* Form Elements */
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            background: #f5f5f5;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        /* Profile Card */
+        .profile-card {
+            background: white;
+            border-radius: 25px;
+            overflow: hidden;
+            margin-bottom: 1rem;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+        
+        .card-image {
+            position: relative;
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .card-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .card-badge {
+            position: absolute;
+            top: 1rem;
+            left: 1rem;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .card-table {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(255, 0, 0, 0.9);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            color: white;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .card-info {
+            padding: 1.5rem;
+        }
+        
+        .card-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .card-details {
+            color: #666;
+            margin-bottom: 1rem;
+        }
+        
+        .card-hobbies {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .hobby-tag {
+            background: rgba(255, 0, 0, 0.1);
+            color: #FF0000;
+            padding: 0.4rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        /* Swipe Actions */
+        .swipe-actions {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            padding: 1rem 0;
+        }
+        
+        .swipe-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-pass {
+            background: rgba(255, 0, 0, 0.2);
+            color: #FF0000;
+        }
+        
+        .btn-like {
+            background: rgba(0, 255, 0, 0.2);
+            color: #00FF00;
+        }
+        
+        .btn-drink {
+            background: rgba(255, 165, 0, 0.2);
+            color: #FF8C00;
+            font-size: 1.5rem;
+        }
+        
+        /* Chat */
+        .chat-list {
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        
+        .chat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 0.5rem;
+            cursor: pointer;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+        
+        .chat-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .chat-content {
+            flex: 1;
+        }
+        
+        .chat-name {
+            font-weight: 600;
+            margin-bottom: 0.2rem;
+        }
+        
+        .chat-preview {
+            color: #999;
+            font-size: 0.85rem;
+        }
+        
+        .chat-window {
+            display: flex;
+            flex-direction: column;
+            height: 70vh;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background: #f9f9f9;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            display: flex;
+        }
+        
+        .message-content {
+            max-width: 70%;
+            padding: 0.8rem;
+            border-radius: 12px;
+        }
+        
+        .message.sent {
+            justify-content: flex-end;
+        }
+        
+        .message.sent .message-content {
+            background: #FF0000;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+        
+        .message.received .message-content {
+            background: white;
+            border-bottom-left-radius: 4px;
+        }
+        
+        .chat-input-container {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .chat-input {
+            flex: 1;
+            margin-bottom: 0;
+        }
+        
+        .btn-send {
+            width: 50px;
+            padding: 0.8rem;
+            margin-bottom: 0;
+        }
+        
+        /* Bottom Nav */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: none;
+            justify-content: space-around;
+            padding: 0.8rem 0;
+            z-index: 1000;
+        }
+        
+        .bottom-nav.active {
+            display: flex;
+        }
+        
+        .nav-item {
+            text-align: center;
+            color: #999;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: #FF0000;
+        }
+        
+        .nav-icon {
+            font-size: 1.5rem;
+            margin-bottom: 0.2rem;
+        }
+        
+        .nav-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+        }
+        
+        .nav-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #FF0000;
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        /* Photo Gallery */
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1rem;
+        }
+        
+        .photo-slot {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f0f0f0;
+            cursor: pointer;
+        }
+        
+        .photo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-delete {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255, 0, 0, 0.9);
+            border: none;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        /* Loading */
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 0, 0, 0.3);
+            border-top-color: #FF0000;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 2rem auto;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Checkbox Group */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<div class="app-header">
+    <div class="logo-container">
+        <svg class="logo-bunny" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="48" fill="white"/>
+            <ellipse cx="35" cy="25" rx="8" ry="20" fill="#FF0000" transform="rotate(-20 35 25)"/>
+            <ellipse cx="65" cy="25" rx="8" ry="20" fill="#FF0000" transform="rotate(20 65 25)"/>
+            <circle cx="50" cy="55" r="25" fill="#FF0000"/>
+            <path d="M 45 65 L 50 75 L 55 65 Z" fill="white"/>
+        </svg>
+        <div class="logo-text">Red Bunny</div>
+    </div>
+    <div class="status-bar">
+        <div class="status-item">
+            <span style="display: inline-block; width: 8px; height: 8px; background: #00ff00; border-radius: 50%;"></span>
+            <span id="statusText">Connecting...</span>
+        </div>
+        <div class="status-item">
+            📍 Table <span id="tableNumber">--</span>
+        </div>
+    </div>
+</div>
+
+<div class="main-content">
+    <!-- Loading -->
+    <div id="loadingSection" class="section active">
+        <div class="card" style="text-align: center;">
+            <div class="spinner"></div>
+            <p id="loadingText">Starting Red Bunny...</p>
+        </div>
+    </div>
+
+    <!-- Welcome -->
+    <div id="welcomeSection" class="section">
+        <div class="card" style="text-align: center;">
+            <div style="font-size: 4rem; margin-bottom: 1rem;">🐰</div>
+            <h2>Welcome to Red Bunny!</h2>
+            <p style="color: #666; line-height: 1.6; margin: 1.5rem 0;">Meet singles at the bar tonight! Check in to start matching.</p>
+            <button class="btn" onclick="startCheckIn()">📱 Check In Now</button>
+        </div>
+    </div>
+
+    <!-- Profile Setup -->
+    <div id="profileSetupSection" class="section">
+        <div class="card">
+            <h2 style="margin-bottom: 1.5rem;">✨ Complete Your Profile</h2>
+            
+            <label>📸 Photos (Add at least 1)</label>
+            <div class="photo-gallery" id="photoGallery"></div>
+            <input type="file" id="photoUpload" accept="image/*" style="display: none;">
+            <button class="btn btn-secondary" onclick="document.getElementById('photoUpload').click()" style="margin-bottom: 1.5rem;">
+                📸 Add Photo
+            </button>
+            
+            <label>👤 Name</label>
+            <input type="text" id="inputName" placeholder="Your first name">
+            
+            <label>🎂 Age</label>
+            <input type="number" id="inputAge" min="18" max="99" placeholder="18+">
+            
+            <label>⚧ Gender</label>
+            <select id="inputGender">
+                <option value="">Select...</option>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+            </select>
+            
+            <label>✍️ Bio</label>
+            <textarea id="inputBio" placeholder="Tell people about yourself..."></textarea>
+            
+            <label>🍸 Preferred Drink</label>
+            <select id="inputDrink">
+                <option value="">Select your favorite...</option>
+                <option value="🍸 Martini">🍸 Martini</option>
+                <option value="🍹 Mojito">🍹 Mojito</option>
+                <option value="🍷 Wine">🍷 Wine</option>
+                <option value="🍺 Beer">🍺 Beer</option>
+                <option value="🥃 Whiskey">🥃 Whiskey</option>
+            </select>
+            
+            <label>🎯 Hobbies & Interests</label>
+            <div class="checkbox-group">
+                <div class="checkbox-item"><input type="checkbox" value="Music"> Music</div>
+                <div class="checkbox-item"><input type="checkbox" value="Travel"> Travel</div>
+                <div class="checkbox-item"><input type="checkbox" value="Sports"> Sports</div>
+                <div class="checkbox-item"><input type="checkbox" value="Cooking"> Cooking</div>
+                <div class="checkbox-item"><input type="checkbox" value="Dancing"> Dancing</div>
+                <div class="checkbox-item"><input type="checkbox" value="Movies"> Movies</div>
+                <div class="checkbox-item"><input type="checkbox" value="Fitness"> Fitness</div>
+                <div class="checkbox-item"><input type="checkbox" value="Art"> Art</div>
+                <div class="checkbox-item"><input type="checkbox" value="Gaming"> Gaming</div>
+                <div class="checkbox-item"><input type="checkbox" value="Photography"> Photography</div>
+            </div>
+            
+            <button class="btn" onclick="saveProfile()">✅ Save & Start Matching</button>
+        </div>
+    </div>
+
+    <!-- Discover -->
+    <div id="discoverSection" class="section">
+        <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; margin-bottom: 1rem;">
+            <p style="color: #666; margin-bottom: 0.5rem;">Singles here tonight</p>
+            <p style="font-size: 2rem; font-weight: 700; color: #FF0000;" id="singlesCount">0</p>
+        </div>
+        <div id="discoverCards"></div>
+    </div>
+
+    <!-- Matches -->
+    <div id="matchesSection" class="section">
+        <h2 style="margin-bottom: 1rem;">💕 Your Matches</h2>
+        <div id="matchesList"></div>
+    </div>
+
+    <!-- Chat -->
+    <div id="chatSection" class="section">
+        <div id="chatList">
+            <h2 style="margin-bottom: 1rem;">💬 Messages</h2>
+            <div class="chat-list" id="conversations"></div>
+        </div>
+        <div id="chatWindow" style="display: none;">
+            <button class="btn btn-secondary" onclick="backToChats()" style="margin-bottom: 1rem;">← Back</button>
+            <div class="chat-window">
+                <div class="chat-messages" id="messages"></div>
+                <div class="chat-input-container">
+                    <input type="text" class="chat-input" id="messageInput" placeholder="Type a message...">
+                    <button class="btn btn-send" onclick="sendMessage()">➤</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Profile -->
+    <div id="profileSection" class="section">
+        <h2 style="margin-bottom: 1rem;">My Profile</h2>
+        <div id="profileView"></div>
+    </div>
+</div>
+
+<div class="bottom-nav" id="bottomNav">
+    <div class="nav-item active" onclick="showSection('discover')">
+        <div class="nav-icon">🔥</div>
+        <div class="nav-label">Discover</div>
+    </div>
+    <div class="nav-item" onclick="showSection('matches')">
+        <div class="nav-icon">💕</div>
+        <div class="nav-label">Matches</div>
+    </div>
+    <div class="nav-item" onclick="showSection('chat')">
+        <div class="nav-icon" style="position: relative;">💬<span class="nav-badge" id="msgBadge" style="display: none;">0</span></div>
+        <div class="nav-label">Chat</div>
+    </div>
+    <div class="nav-item" onclick="showSection('profile')">
+        <div class="nav-icon">👤</div>
+        <div class="nav-label">Profile</div>
+    </div>
+</div>
+
+<script>
+// TODO: Replace with your actual API URL after deploying backend
+const API_URL = 'https://red-bunny-backend.onrender.com/api';
+const BAR_TON_WALLET = 'WALLET_COMING_SOON';
+
+let tg = window.Telegram?.WebApp;
+if (tg) { tg.ready(); tg.expand(); }
+
+let currentUser = null;
+let userPhotos = [];
+let telegramUser = null;
+let currentChatUser = null;
+
+// Initialize
+async function init() {
+    try {
+        document.getElementById('loadingText').textContent = 'Connecting...';
+        
+        // Get Telegram user
+        telegramUser = (tg && tg.initDataUnsafe?.user) 
+            ? tg.initDataUnsafe.user 
+            : { id: Math.floor(Math.random() * 1000000), first_name: 'Test', username: 'testuser' };
+        
+        // Check if user exists
+        const response = await fetch(`${API_URL}/users?telegram_id=${telegramUser.id}`);
+        const users = await response.json();
+        
+        if (users && users.length > 0) {
+            currentUser = users[0];
+            
+            // Load photos
+            const photosRes = await fetch(`${API_URL}/photos?user_id=${currentUser.id}`);
+            const photos = await photosRes.json();
+            if (photos) userPhotos = photos;
+            
+            // Check if checked in
+            const checkinsRes = await fetch(`${API_URL}/checkins?user_id=${currentUser.id}&is_active=true`);
+            const checkins = await checkinsRes.json();
+            
+            if (checkins && checkins.length > 0) {
+                document.getElementById('tableNumber').textContent = checkins[0].table_number;
+                document.getElementById('bottomNav').classList.add('active');
+                showSection('discover');
+            } else {
+                showSection('welcome');
+            }
+        } else {
+            showSection('welcome');
+        }
+        
+        document.getElementById('statusText').innerHTML = '<span style="color: #00ff00;">●</span> LIVE';
+    } catch (error) {
+        console.error('Init error:', error);
+        alert('Connection error: ' + error.message);
+    }
+}
+
+// Check in
+async function startCheckIn() {
+    try {
+        const tableNum = Math.floor(Math.random() * 10) + 1;
+        
+        // Create user if doesn't exist
+        if (!currentUser) {
+            const response = await fetch(`${API_URL}/users`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    telegram_id: telegramUser.id,
+                    username: telegramUser.username || '',
+                    first_name: telegramUser.first_name || 'User'
+                })
+            });
+            const data = await response.json();
+            currentUser = Array.isArray(data) ? data[0] : data;
+        }
+        
+        // Create check-in
+        await fetch(`${API_URL}/checkins`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: currentUser.id,
+                table_number: tableNum,
+                is_active: true
+            })
+        });
+        
+        document.getElementById('tableNumber').textContent = tableNum;
+        
+        if (!currentUser.name || !currentUser.gender) {
+            showSection('profileSetup');
+        } else {
+            document.getElementById('bottomNav').classList.add('active');
+            showSection('discover');
+        }
+    } catch (error) {
+        alert('Check-in failed: ' + error.message);
+    }
+}
+
+// Photo upload
+document.getElementById('photoUpload').addEventListener('change', async function(e) {
+    const file = e.target.files[0];
+    if (!file || !file.type.startsWith('image/')) {
+        alert('Please select an image');
+        return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = async function(event) {
+        const photoUrl = event.target.result;
+        
+        const response = await fetch(`${API_URL}/photos`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: currentUser.id,
+                photo_url: photoUrl,
+                is_primary: userPhotos.length === 0,
+                position: userPhotos.length
+            })
+        });
+        
+        const data = await response.json();
+        userPhotos.push(data[0] || data);
+        renderPhotoGallery();
+    };
+    reader.readAsDataURL(file);
+});
+
+function renderPhotoGallery() {
+    document.getElementById('photoGallery').innerHTML = userPhotos.map((photo, i) => `
+        <div class="photo-slot">
+            <img src="${photo.photo_url}" alt="Photo ${i+1}">
+            <button class="photo-delete" onclick="deletePhoto(${photo.id})">×</button>
+        </div>
+    `).join('');
+}
+
+async function deletePhoto(photoId) {
+    if (!confirm('Delete this photo?')) return;
+    await fetch(`${API_URL}/photos/${photoId}`, { method: 'DELETE' });
+    userPhotos = userPhotos.filter(p => p.id !== photoId);
+    renderPhotoGallery();
+}
+
+// Save profile
+async function saveProfile() {
+    const name = document.getElementById('inputName').value.trim();
+    const age = parseInt(document.getElementById('inputAge').value);
+    const gender = document.getElementById('inputGender').value;
+    const bio = document.getElementById('inputBio').value.trim();
+    const drink = document.getElementById('inputDrink').value;
+    
+    const hobbies = Array.from(document.querySelectorAll('.checkbox-item input:checked'))
+        .map(cb => cb.value);
+    
+    if (!name || !age || !gender || userPhotos.length === 0) {
+        alert('Please add photo, name, age, and gender!');
+        return;
+    }
+    
+    await fetch(`${API_URL}/users/${currentUser.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, age, gender, bio, preferred_drink: drink, hobbies })
+    });
+    
+    currentUser = { ...currentUser, name, age, gender, bio, preferred_drink: drink, hobbies };
+    document.getElementById('bottomNav').classList.add('active');
+    showSection('discover');
+}
+
+// Load singles
+async function loadSingles() {
+    try {
+        const response = await fetch(`${API_URL}/checkins?is_active=true&exclude_user=${currentUser.id}`);
+        const checkins = await response.json();
+        
+        document.getElementById('singlesCount').textContent = checkins.length;
+        
+        if (checkins.length === 0) {
+            document.getElementById('discoverCards').innerHTML = `
+                <div class="card" style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 4rem;">🐰</div>
+                    <h3>No one else here yet!</h3>
+                    <p style="color: #666;">Be the first tonight 🔥</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const cards = [];
+        for (const checkin of checkins) {
+            const user = checkin.users;
+            if (!user || !user.gender) continue;
+            
+            const photosRes = await fetch(`${API_URL}/photos?user_id=${user.id}&is_primary=true&limit=1`);
+            const photos = await photosRes.json();
+            const photoUrl = photos && photos[0] ? photos[0].photo_url : null;
+            
+            cards.push(`
+                <div class="profile-card" data-user-id="${user.id}">
+                    <div class="card-image">
+                        ${photoUrl ? `<img src="${photoUrl}" alt="${user.name}">` : '<span style="font-size: 4rem;">👤</span>'}
+                        <div class="card-badge">Here Now 🔴</div>
+                        <div class="card-table">Table ${checkin.table_number}</div>
+                    </div>
+                    <div class="card-info">
+                        <div class="card-name">${user.name}, ${user.age}</div>
+                        <div class="card-details">${user.gender === 'male' ? '♂️' : '♀️'} • ${user.bio || 'Hey there!'}</div>
+                        ${user.preferred_drink ? `<div style="margin: 0.5rem 0;">🍹 ${user.preferred_drink}</div>` : ''}
+                        ${user.hobbies && user.hobbies.length > 0 ? `
+                            <div class="card-hobbies">
+                                ${user.hobbies.map(h => `<span class="hobby-tag">${h}</span>`).join('')}
+                            </div>
+                        ` : ''}
+                        <div class="swipe-actions">
+                            <button class="swipe-btn btn-pass" onclick="swipe('${user.id}', false)">✕</button>
+                            <button class="swipe-btn btn-drink" onclick="sendDrink('${user.id}')">🍹</button>
+                            <button class="swipe-btn btn-like" onclick="swipe('${user.id}', true)">❤️</button>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+        
+        document.getElementById('discoverCards').innerHTML = cards.join('');
+    } catch (error) {
+        console.error('Load singles error:', error);
+    }
+}
+
+// Swipe
+async function swipe(userId, liked) {
+    try {
+        const response = await fetch(`${API_URL}/matches`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user1_id: currentUser.id,
+                user2_id: userId,
+                liked
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.new_match) {
+            alert('💕 It\'s a Match!');
+        }
+        
+        // Remove card
+        const card = document.querySelector(`[data-user-id="${userId}"]`);
+        if (card) card.remove();
+        
+        // Reload if no more cards
+        if (document.querySelectorAll('.profile-card').length === 0) {
+            loadSingles();
+        }
+    } catch (error) {
+        console.error('Swipe error:', error);
+    }
+}
+
+// Send drink (TON payment)
+async function sendDrink(userId) {
+    alert('🍹 TON Payment feature coming soon! Connect your TON wallet to send drinks.');
+    // TODO: Implement TON Connect integration
+}
+
+// Show section
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(name + 'Section').classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    const navItems = document.querySelectorAll('.nav-item');
+    if (name === 'discover' && navItems[0]) navItems[0].classList.add('active');
+    if (name === 'matches' && navItems[1]) navItems[1].classList.add('active');
+    if (name === 'chat' && navItems[2]) navItems[2].classList.add('active');
+    if (name === 'profile' && navItems[3]) navItems[3].classList.add('active');
+    
+    if (name === 'discover') loadSingles();
+    if (name === 'matches') loadMatches();
+    if (name === 'chat') loadConversations();
+    if (name === 'profile') loadProfile();
+}
+
+// Load matches
+async function loadMatches() {
+    try {
+        const response = await fetch(`${API_URL}/matches?user_id=${currentUser.id}`);
+        const matches = await response.json();
+        
+        if (matches.length === 0) {
+            document.getElementById('matchesList').innerHTML = `
+                <div class="card" style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 4rem;">💕</div>
+                    <h3>No matches yet!</h3>
+                    <p style="color: #666;">Keep swiping to find your match!</p>
+                </div>
+            `;
+            return;
+        }
+        
+        const html = matches.map(match => {
+            const otherUser = match.user1.id === currentUser.id ? match.user2 : match.user1;
+            return `
+                <div class="chat-item" onclick="openChat('${otherUser.id}')">
+                    <div class="chat-avatar">👤</div>
+                    <div class="chat-content">
+                        <div class="chat-name">${otherUser.name}, ${otherUser.age}</div>
+                        <div class="chat-preview">💕 Matched!</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        document.getElementById('matchesList').innerHTML = html;
+    } catch (error) {
+        console.error('Load matches error:', error);
+    }
+}
+
+// Chat functions
+async function loadConversations() {
+    const response = await fetch(`${API_URL}/matches?user_id=${currentUser.id}`);
+    const matches = await response.json();
+    
+    if (matches.length === 0) {
+        document.getElementById('conversations').innerHTML = `
+            <div class="card" style="text-align: center; padding: 2rem;">
+                <div style="font-size: 4rem;">💬</div>
+                <h3>No conversations yet!</h3>
+                <p style="color: #666;">Match with someone to start chatting!</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const html = matches.map(match => {
+        const otherUser = match.user1.id === currentUser.id ? match.user2 : match.user1;
+        return `
+            <div class="chat-item" onclick="openChat('${otherUser.id}', '${otherUser.name}')">
+                <div class="chat-avatar">👤</div>
+                <div class="chat-content">
+                    <div class="chat-name">${otherUser.name}</div>
+                    <div class="chat-preview">Start chatting...</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    document.getElementById('conversations').innerHTML = html;
+}
+
+async function openChat(userId, userName) {
+    currentChatUser = { id: userId, name: userName };
+    document.getElementById('chatList').style.display = 'none';
+    document.getElementById('chatWindow').style.display = 'block';
+    loadMessages();
+}
+
+function backToChats() {
+    document.getElementById('chatList').style.display = 'block';
+    document.getElementById('chatWindow').style.display = 'none';
+    currentChatUser = null;
+}
+
+async function loadMessages() {
+    const response = await fetch(`${API_URL}/messages?user1_id=${currentUser.id}&user2_id=${currentChatUser.id}`);
+    const messages = await response.json();
+    
+    const html = messages.map(msg => `
+        <div class="message ${msg.sender_id === currentUser.id ? 'sent' : 'received'}">
+            <div class="message-content">${msg.message}</div>
+        </div>
+    `).join('');
+    
+    document.getElementById('messages').innerHTML = html || '<p style="text-align: center; color: #999;">No messages yet. Say hi!</p>';
+    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+}
+
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message) return;
+    
+    await fetch(`${API_URL}/messages`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            sender_id: currentUser.id,
+            receiver_id: currentChatUser.id,
+            message
+        })
+    });
+    
+    input.value = '';
+    loadMessages();
+}
+
+// Load profile
+async function loadProfile() {
+    const photoUrl = userPhotos[0]?.photo_url || null;
+    document.getElementById('profileView').innerHTML = `
+        <div class="profile-card">
+            <div class="card-image">
+                ${photoUrl ? `<img src="${photoUrl}" alt="${currentUser.name}">` : '<span style="font-size: 4rem;">👤</span>'}
+                <div class="card-badge">Here Now 🔴</div>
+            </div>
+            <div class="card-info">
+                <div class="card-name">${currentUser.name}, ${currentUser.age}</div>
+                <div class="card-details">${currentUser.gender === 'male' ? '♂️' : '♀️'} • ${currentUser.bio || ''}</div>
+                ${currentUser.preferred_drink ? `<div style="margin: 0.5rem 0;">🍹 ${currentUser.preferred_drink}</div>` : ''}
+                ${currentUser.hobbies && currentUser.hobbies.length > 0 ? `
+                    <div class="card-hobbies">
+                        ${currentUser.hobbies.map(h => `<span class="hobby-tag">${h}</span>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+        <button class="btn btn-secondary" style="margin-top: 1rem;" onclick="checkOut()">🚪 Check Out</button>
+    `;
+}
+
+async function checkOut() {
+    if (!confirm('Check out from the bar?')) return;
+    const response = await fetch(`${API_URL}/checkins?user_id=${currentUser.id}&is_active=true`);
+    const checkins = await response.json();
+    if (checkins[0]) {
+        await fetch(`${API_URL}/checkins/${checkins[0].id}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ is_active: false })
+        });
+    }
+    document.getElementById('tableNumber').textContent = '--';
+    document.getElementById('bottomNav').classList.remove('active');
+    showSection('welcome');
+}
+
+// Start
+init();
+
+// Auto-refresh singles every 30 seconds
+setInterval(() => {
+    if (document.getElementById('discoverSection').classList.contains('active')) {
+        loadSingles();
+    }
+}, 30000);
+</script>
+
+</body>
+</html>
