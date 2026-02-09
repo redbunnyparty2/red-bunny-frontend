@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Red Bunny - Dating at the Bar</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://unpkg.com/@tonconnect/ui@latest/dist/tonconnect-ui.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         * {
@@ -21,7 +20,7 @@
             overflow-x: hidden;
         }
         
-        /* Header */
+        /* Header - SAME RED GRADIENT */
         .app-header {
             background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
             padding: 1rem;
@@ -93,7 +92,7 @@
             display: block;
         }
         
-        /* Cards */
+        /* Cards - SAME WHITE CARDS */
         .card {
             background: white;
             border-radius: 20px;
@@ -102,7 +101,7 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
         }
         
-        /* Buttons */
+        /* Buttons - SAME RED BUTTONS */
         .btn {
             width: 100%;
             padding: 1rem;
@@ -139,12 +138,220 @@
             margin-bottom: 1rem;
         }
         
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #FF0000;
+        }
+        
         label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 600;
             color: #666;
             font-size: 0.85rem;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        /* Photo Gallery */
+        .photo-gallery {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .photo-slot {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f0f0f0;
+            cursor: pointer;
+        }
+        
+        .photo-slot img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .photo-delete {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background: rgba(255, 0, 0, 0.9);
+            border: none;
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1.2rem;
+        }
+        
+        /* Hobbies */
+        .checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .checkbox-item input {
+            width: auto;
+            margin: 0;
+        }
+        
+        /* Table Map */
+        .table-map-title {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+        
+        .tables-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            max-width: 400px;
+            margin: 0 auto 1.5rem;
+        }
+        
+        .table-spot {
+            aspect-ratio: 1;
+            background: #f5f5f5;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: 2px solid transparent;
+        }
+        
+        .table-spot:hover {
+            border-color: #FF0000;
+            transform: scale(1.05);
+        }
+        
+        .table-spot.active {
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            color: white;
+        }
+        
+        .table-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+        
+        .table-count {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            margin-top: 0.3rem;
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        
+        .modal.active {
+            display: flex;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            max-width: 500px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 2rem;
+            cursor: pointer;
+            color: #666;
+        }
+        
+        .person-card {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 12px;
+            margin-bottom: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .person-card:hover {
+            background: #e0e0e0;
+        }
+        
+        .person-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            flex-shrink: 0;
+        }
+        
+        .person-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+        }
+        
+        .person-info {
+            flex: 1;
+        }
+        
+        .person-name {
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+        }
+        
+        .person-details {
+            font-size: 0.9rem;
+            color: #666;
         }
         
         /* Profile Card */
@@ -155,6 +362,8 @@
             margin-bottom: 1rem;
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
             position: relative;
+            touch-action: pan-y;
+            user-select: none;
         }
         
         .card-image {
@@ -197,6 +406,35 @@
             font-weight: 600;
         }
         
+        /* Swipe Overlay */
+        .swipe-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 4rem;
+            font-weight: 900;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+        }
+        
+        .swipe-overlay.nope {
+            background: rgba(255, 0, 0, 0.3);
+            color: #FF0000;
+            opacity: 1;
+        }
+        
+        .swipe-overlay.like {
+            background: rgba(0, 255, 0, 0.3);
+            color: #00FF00;
+            opacity: 1;
+        }
+        
         .card-info {
             padding: 1.5rem;
         }
@@ -216,15 +454,14 @@
             display: flex;
             flex-wrap: wrap;
             gap: 0.5rem;
-            margin-top: 1rem;
         }
         
-        .hobby-tag {
+        .hobby-pill {
+            padding: 0.4rem 0.8rem;
             background: rgba(255, 0, 0, 0.1);
             color: #FF0000;
-            padding: 0.4rem 0.8rem;
             border-radius: 20px;
-            font-size: 0.8rem;
+            font-size: 0.85rem;
             font-weight: 600;
         }
         
@@ -232,8 +469,8 @@
         .swipe-actions {
             display: flex;
             justify-content: center;
-            gap: 1.5rem;
-            padding: 1rem 0;
+            gap: 2rem;
+            margin-top: 1rem;
         }
         
         .swipe-btn {
@@ -244,127 +481,88 @@
             font-size: 2rem;
             cursor: pointer;
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .swipe-btn:active {
+            transform: scale(0.9);
         }
         
         .btn-pass {
-            background: rgba(255, 0, 0, 0.2);
+            background: linear-gradient(135deg, #FFE5E5, #FFCCCC);
             color: #FF0000;
         }
         
         .btn-like {
-            background: rgba(0, 255, 0, 0.2);
-            color: #00FF00;
+            background: linear-gradient(135deg, #E5FFE5, #CCFFCC);
+            color: #00AA00;
         }
         
-        .btn-drink {
-            background: rgba(255, 165, 0, 0.2);
-            color: #FF8C00;
-            font-size: 1.5rem;
-        }
-        
-        /* Chat */
-        .chat-list {
-            max-height: 60vh;
-            overflow-y: auto;
-        }
-        
-        .chat-item {
-            background: white;
-            padding: 1rem;
-            border-radius: 12px;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-        
-        .chat-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            display: flex;
+        /* Match Modal - RED THEME! */
+        .match-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            z-index: 2000;
+            display: none;
             align-items: center;
             justify-content: center;
-            font-size: 1.5rem;
+            padding: 2rem;
         }
         
-        .chat-content {
-            flex: 1;
-        }
-        
-        .chat-name {
-            font-weight: 600;
-            margin-bottom: 0.2rem;
-        }
-        
-        .chat-preview {
-            color: #999;
-            font-size: 0.85rem;
-        }
-        
-        .chat-window {
+        .match-modal.active {
             display: flex;
-            flex-direction: column;
-            height: 70vh;
+            animation: fadeIn 0.5s;
         }
         
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 1rem;
-            background: #f9f9f9;
-            border-radius: 12px;
-            margin-bottom: 1rem;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
         }
         
-        .message {
-            margin-bottom: 1rem;
-            display: flex;
-        }
-        
-        .message-content {
-            max-width: 70%;
-            padding: 0.8rem;
-            border-radius: 12px;
-        }
-        
-        .message.sent {
-            justify-content: flex-end;
-        }
-        
-        .message.sent .message-content {
-            background: #FF0000;
+        .match-content {
+            text-align: center;
             color: white;
-            border-bottom-right-radius: 4px;
         }
         
-        .message.received .message-content {
-            background: white;
-            border-bottom-left-radius: 4px;
+        .match-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
         }
         
-        .chat-input-container {
+        .match-subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+        }
+        
+        .match-avatars {
             display: flex;
-            gap: 0.5rem;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
         }
         
-        .chat-input {
-            flex: 1;
-            margin-bottom: 0;
+        .match-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid white;
+            overflow: hidden;
+            background: white;
         }
         
-        .btn-send {
-            width: 50px;
-            padding: 0.8rem;
-            margin-bottom: 0;
+        .match-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
         
-        /* Bottom Nav */
+        /* Bottom Nav - SAME AS ORIGINAL */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -374,8 +572,8 @@
             border-top: 1px solid #e0e0e0;
             display: none;
             justify-content: space-around;
-            padding: 0.8rem 0;
-            z-index: 1000;
+            padding: 0.75rem 0;
+            z-index: 100;
         }
         
         .bottom-nav.active {
@@ -386,7 +584,6 @@
             text-align: center;
             color: #999;
             cursor: pointer;
-            transition: all 0.3s;
             flex: 1;
         }
         
@@ -404,62 +601,10 @@
             font-weight: 600;
         }
         
-        .nav-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background: #FF0000;
-            color: white;
-            border-radius: 50%;
-            width: 18px;
-            height: 18px;
-            font-size: 0.7rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Photo Gallery */
-        .photo-gallery {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 0.8rem;
-            margin-bottom: 1rem;
-        }
-        
-        .photo-slot {
-            position: relative;
-            aspect-ratio: 1;
-            border-radius: 12px;
-            overflow: hidden;
-            background: #f0f0f0;
-            cursor: pointer;
-        }
-        
-        .photo-slot img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .photo-delete {
-            position: absolute;
-            top: 0.5rem;
-            right: 0.5rem;
-            background: rgba(255, 0, 0, 0.9);
-            border: none;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            font-size: 1.2rem;
-        }
-        
         /* Loading */
         .spinner {
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             border: 4px solid rgba(255, 0, 0, 0.3);
             border-top-color: #FF0000;
             border-radius: 50%;
@@ -471,23 +616,14 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Checkbox Group */
-        .checkbox-group {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 0.5rem;
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+        
+        .empty-icon {
+            font-size: 4rem;
             margin-bottom: 1rem;
-        }
-        
-        .checkbox-item {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .checkbox-item input {
-            width: auto;
-            margin: 0;
         }
     </style>
 </head>
@@ -502,7 +638,7 @@
             <circle cx="50" cy="55" r="25" fill="#FF0000"/>
             <path d="M 45 65 L 50 75 L 55 65 Z" fill="white"/>
         </svg>
-        <div class="logo-text">Red Bunny</div>
+        <span class="logo-text">Red Bunny</span>
     </div>
     <div class="status-bar">
         <div class="status-item">
@@ -516,7 +652,7 @@
 </div>
 
 <div class="main-content">
-    <!-- Loading -->
+    <!-- Loading Section -->
     <div id="loadingSection" class="section active">
         <div class="card" style="text-align: center;">
             <div class="spinner"></div>
@@ -524,17 +660,19 @@
         </div>
     </div>
 
-    <!-- Welcome -->
+    <!-- Welcome Section -->
     <div id="welcomeSection" class="section">
         <div class="card" style="text-align: center;">
             <div style="font-size: 4rem; margin-bottom: 1rem;">🐰</div>
             <h2>Welcome to Red Bunny!</h2>
-            <p style="color: #666; line-height: 1.6; margin: 1.5rem 0;">Meet singles at the bar tonight! Check in to start matching.</p>
-            <button class="btn" onclick="startCheckIn()">📱 Check In Now</button>
+            <p style="color: #666; line-height: 1.6; margin: 1.5rem 0;">
+                Meet amazing singles at the bar tonight! Check in to start matching.
+            </p>
+            <button class="btn" onclick="startCheckIn()">📱 Check In at Bar</button>
         </div>
     </div>
 
-    <!-- Profile Setup -->
+    <!-- Profile Setup Section -->
     <div id="profileSetupSection" class="section">
         <div class="card">
             <h2 style="margin-bottom: 1.5rem;">✨ Complete Your Profile</h2>
@@ -547,7 +685,7 @@
             </button>
             
             <label>👤 Name</label>
-            <input type="text" id="inputName" placeholder="Your first name">
+            <input type="text" id="inputName" placeholder="Your name">
             
             <label>🎂 Age</label>
             <input type="number" id="inputAge" min="18" max="99" placeholder="18+">
@@ -590,7 +728,16 @@
         </div>
     </div>
 
-    <!-- Discover -->
+    <!-- Table Map Section -->
+    <div id="tableMapSection" class="section">
+        <div class="card">
+            <h2 class="table-map-title">🗺️ Who's at the Bar</h2>
+            <div class="tables-grid" id="tablesGrid"></div>
+            <button class="btn" onclick="showSection('discover')">🔥 Start Swiping</button>
+        </div>
+    </div>
+
+    <!-- Discover Section -->
     <div id="discoverSection" class="section">
         <div style="text-align: center; padding: 1rem; background: white; border-radius: 12px; margin-bottom: 1rem;">
             <p style="color: #666; margin-bottom: 0.5rem;">Singles here tonight</p>
@@ -599,38 +746,47 @@
         <div id="discoverCards"></div>
     </div>
 
-    <!-- Matches -->
+    <!-- Matches Section -->
     <div id="matchesSection" class="section">
         <h2 style="margin-bottom: 1rem;">💕 Your Matches</h2>
         <div id="matchesList"></div>
     </div>
 
-    <!-- Chat -->
-    <div id="chatSection" class="section">
-        <div id="chatList">
-            <h2 style="margin-bottom: 1rem;">💬 Messages</h2>
-            <div class="chat-list" id="conversations"></div>
-        </div>
-        <div id="chatWindow" style="display: none;">
-            <button class="btn btn-secondary" onclick="backToChats()" style="margin-bottom: 1rem;">← Back</button>
-            <div class="chat-window">
-                <div class="chat-messages" id="messages"></div>
-                <div class="chat-input-container">
-                    <input type="text" class="chat-input" id="messageInput" placeholder="Type a message...">
-                    <button class="btn btn-send" onclick="sendMessage()">➤</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Profile -->
+    <!-- Profile Section -->
     <div id="profileSection" class="section">
         <h2 style="margin-bottom: 1rem;">My Profile</h2>
         <div id="profileView"></div>
     </div>
 </div>
 
+<!-- Table Detail Modal -->
+<div class="modal" id="tableModal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modalTitle">Table #</h2>
+            <button class="modal-close" onclick="closeTableModal()">×</button>
+        </div>
+        <div id="tablePeople"></div>
+    </div>
+</div>
+
+<!-- Match Modal -->
+<div class="match-modal" id="matchModal">
+    <div class="match-content">
+        <h1 class="match-title">IT'S A MATCH! 🎉</h1>
+        <p class="match-subtitle">You both liked each other!</p>
+        <div class="match-avatars" id="matchAvatars"></div>
+        <button class="btn" style="background: white; color: #FF0000;" onclick="closeMatchModal()">💬 Send Message</button>
+        <button class="btn" style="margin-top: 1rem; background: rgba(255,255,255,0.2);" onclick="closeMatchModal()">Keep Swiping</button>
+    </div>
+</div>
+
+<!-- Bottom Navigation -->
 <div class="bottom-nav" id="bottomNav">
+    <div class="nav-item" onclick="showSection('tableMap')">
+        <div class="nav-icon">🗺️</div>
+        <div class="nav-label">Map</div>
+    </div>
     <div class="nav-item active" onclick="showSection('discover')">
         <div class="nav-icon">🔥</div>
         <div class="nav-label">Discover</div>
@@ -639,10 +795,6 @@
         <div class="nav-icon">💕</div>
         <div class="nav-label">Matches</div>
     </div>
-    <div class="nav-item" onclick="showSection('chat')">
-        <div class="nav-icon" style="position: relative;">💬<span class="nav-badge" id="msgBadge" style="display: none;">0</span></div>
-        <div class="nav-label">Chat</div>
-    </div>
     <div class="nav-item" onclick="showSection('profile')">
         <div class="nav-icon">👤</div>
         <div class="nav-label">Profile</div>
@@ -650,48 +802,40 @@
 </div>
 
 <script>
-// TODO: Replace with your actual API URL after deploying backend
 const API_URL = 'https://red-bunny-backend.onrender.com/api';
-const BAR_TON_WALLET = 'WALLET_COMING_SOON';
-
 let tg = window.Telegram?.WebApp;
 if (tg) { tg.ready(); tg.expand(); }
 
 let currentUser = null;
 let userPhotos = [];
-let telegramUser = null;
-let currentChatUser = null;
+let allUsers = [];
+let currentSwipeIndex = 0;
+let swipeStartX = 0;
+let isDragging = false;
+let currentCard = null;
 
-// Initialize
 async function init() {
     try {
-        document.getElementById('loadingText').textContent = 'Connecting...';
-        
-        // Get Telegram user
-        telegramUser = (tg && tg.initDataUnsafe?.user) 
+        const telegramUser = (tg && tg.initDataUnsafe?.user) 
             ? tg.initDataUnsafe.user 
-            : { id: Math.floor(Math.random() * 1000000), first_name: 'Test', username: 'testuser' };
+            : { id: Math.floor(Math.random() * 1000000), first_name: 'Demo', username: 'demo' };
         
-        // Check if user exists
         const response = await fetch(`${API_URL}/users?telegram_id=${telegramUser.id}`);
         const users = await response.json();
         
         if (users && users.length > 0) {
             currentUser = users[0];
-            
-            // Load photos
             const photosRes = await fetch(`${API_URL}/photos?user_id=${currentUser.id}`);
             const photos = await photosRes.json();
             if (photos) userPhotos = photos;
             
-            // Check if checked in
             const checkinsRes = await fetch(`${API_URL}/checkins?user_id=${currentUser.id}&is_active=true`);
             const checkins = await checkinsRes.json();
             
             if (checkins && checkins.length > 0) {
                 document.getElementById('tableNumber').textContent = checkins[0].table_number;
                 document.getElementById('bottomNav').classList.add('active');
-                showSection('discover');
+                showSection('tableMap');
             } else {
                 showSection('welcome');
             }
@@ -699,19 +843,30 @@ async function init() {
             showSection('welcome');
         }
         
-        document.getElementById('statusText').innerHTML = '<span style="color: #00ff00;">●</span> LIVE';
+        updateOnlineCount();
     } catch (error) {
         console.error('Init error:', error);
-        alert('Connection error: ' + error.message);
+        showSection('welcome');
     }
 }
 
-// Check in
+async function updateOnlineCount() {
+    try {
+        const response = await fetch(`${API_URL}/checkins?is_active=true`);
+        const checkins = await response.json();
+        document.getElementById('statusText').textContent = `${checkins.length} here now`;
+    } catch (error) {
+        console.error('Update count error:', error);
+    }
+}
+
 async function startCheckIn() {
     try {
-        const tableNum = Math.floor(Math.random() * 10) + 1;
+        const tableNum = Math.floor(Math.random() * 9) + 1;
+        const telegramUser = (tg && tg.initDataUnsafe?.user) 
+            ? tg.initDataUnsafe.user 
+            : { id: Math.floor(Math.random() * 1000000), first_name: 'Demo' };
         
-        // Create user if doesn't exist
         if (!currentUser) {
             const response = await fetch(`${API_URL}/users`, {
                 method: 'POST',
@@ -726,7 +881,6 @@ async function startCheckIn() {
             currentUser = Array.isArray(data) ? data[0] : data;
         }
         
-        // Create check-in
         await fetch(`${API_URL}/checkins`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -743,25 +897,20 @@ async function startCheckIn() {
             showSection('profileSetup');
         } else {
             document.getElementById('bottomNav').classList.add('active');
-            showSection('discover');
+            showSection('tableMap');
         }
     } catch (error) {
         alert('Check-in failed: ' + error.message);
     }
 }
 
-// Photo upload
 document.getElementById('photoUpload').addEventListener('change', async function(e) {
     const file = e.target.files[0];
-    if (!file || !file.type.startsWith('image/')) {
-        alert('Please select an image');
-        return;
-    }
+    if (!file) return;
     
     const reader = new FileReader();
     reader.onload = async function(event) {
         const photoUrl = event.target.result;
-        
         const response = await fetch(`${API_URL}/photos`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -772,7 +921,6 @@ document.getElementById('photoUpload').addEventListener('change', async function
                 position: userPhotos.length
             })
         });
-        
         const data = await response.json();
         userPhotos.push(data[0] || data);
         renderPhotoGallery();
@@ -786,26 +934,27 @@ function renderPhotoGallery() {
             <img src="${photo.photo_url}" alt="Photo ${i+1}">
             <button class="photo-delete" onclick="deletePhoto(${photo.id})">×</button>
         </div>
-    `).join('');
+    `).join('') + `
+        <div class="photo-slot" onclick="document.getElementById('photoUpload').click()">
+            <span style="font-size: 2rem; color: #999;">📷</span>
+        </div>
+    `;
 }
 
 async function deletePhoto(photoId) {
-    if (!confirm('Delete this photo?')) return;
+    if (!confirm('Delete photo?')) return;
     await fetch(`${API_URL}/photos/${photoId}`, { method: 'DELETE' });
     userPhotos = userPhotos.filter(p => p.id !== photoId);
     renderPhotoGallery();
 }
 
-// Save profile
 async function saveProfile() {
     const name = document.getElementById('inputName').value.trim();
     const age = parseInt(document.getElementById('inputAge').value);
     const gender = document.getElementById('inputGender').value;
     const bio = document.getElementById('inputBio').value.trim();
     const drink = document.getElementById('inputDrink').value;
-    
-    const hobbies = Array.from(document.querySelectorAll('.checkbox-item input:checked'))
-        .map(cb => cb.value);
+    const hobbies = Array.from(document.querySelectorAll('.checkbox-item input:checked')).map(cb => cb.value);
     
     if (!name || !age || !gender || userPhotos.length === 0) {
         alert('Please add photo, name, age, and gender!');
@@ -820,10 +969,97 @@ async function saveProfile() {
     
     currentUser = { ...currentUser, name, age, gender, bio, preferred_drink: drink, hobbies };
     document.getElementById('bottomNav').classList.add('active');
-    showSection('discover');
+    
+    // If user is editing (already has bottom nav), go back to profile
+    // If new user, go to table map
+    const isEditing = document.getElementById('bottomNav').classList.contains('active');
+    if (isEditing) {
+        showSection('profile');
+    } else {
+        showSection('tableMap');
+    }
 }
 
-// Load singles
+async function loadTableMap() {
+    try {
+        const response = await fetch(`${API_URL}/checkins?is_active=true`);
+        const checkins = await response.json();
+        
+        const tableData = {};
+        for (const checkin of checkins) {
+            const tableNum = checkin.table_number;
+            if (!tableData[tableNum]) tableData[tableNum] = [];
+            tableData[tableNum].push(checkin);
+        }
+        
+        let html = '';
+        for (let i = 1; i <= 9; i++) {
+            const people = tableData[i] || [];
+            const isActive = people.length > 0;
+            html += `
+                <div class="table-spot ${isActive ? 'active' : ''}" onclick="showTableDetail(${i})">
+                    <div class="table-number">${i}</div>
+                    <div class="table-count">${people.length} ${people.length === 1 ? 'person' : 'people'}</div>
+                </div>
+            `;
+        }
+        
+        document.getElementById('tablesGrid').innerHTML = html;
+    } catch (error) {
+        console.error('Load table map error:', error);
+    }
+}
+
+async function showTableDetail(tableNum) {
+    try {
+        const response = await fetch(`${API_URL}/checkins?is_active=true`);
+        const checkins = await response.json();
+        
+        const tablePeople = checkins.filter(c => c.table_number === tableNum);
+        
+        if (tablePeople.length === 0) {
+            alert('No one at this table!');
+            return;
+        }
+        
+        document.getElementById('modalTitle').textContent = `Table ${tableNum}`;
+        
+        let html = '';
+        for (const checkin of tablePeople) {
+            const user = checkin.users;
+            
+            if (currentUser.gender === 'male' && user.gender !== 'female') continue;
+            if (currentUser.gender === 'female' && user.gender !== 'male') continue;
+            if (user.id === currentUser.id) continue;
+            
+            const photosRes = await fetch(`${API_URL}/photos?user_id=${user.id}&is_primary=true&limit=1`);
+            const photos = await photosRes.json();
+            const photo = photos && photos[0] ? photos[0].photo_url : null;
+            
+            html += `
+                <div class="person-card" onclick="closeTableModal(); showSection('discover');">
+                    <div class="person-avatar">
+                        ${photo ? `<img src="${photo}">` : (user.gender === 'male' ? '♂️' : '♀️')}
+                    </div>
+                    <div class="person-info">
+                        <div class="person-name">${user.name}, ${user.age}</div>
+                        <div class="person-details">${user.bio || 'Hey there!'}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        document.getElementById('tablePeople').innerHTML = html || '<p style="text-align:center;color:#999;">No one to show at this table</p>';
+        document.getElementById('tableModal').classList.add('active');
+    } catch (error) {
+        console.error('Show table detail error:', error);
+    }
+}
+
+function closeTableModal() {
+    document.getElementById('tableModal').classList.remove('active');
+}
+
 async function loadSingles() {
     try {
         const response = await fetch(`${API_URL}/checkins?is_active=true&exclude_user=${currentUser.id}`);
@@ -831,115 +1067,185 @@ async function loadSingles() {
         
         document.getElementById('singlesCount').textContent = checkins.length;
         
-        if (checkins.length === 0) {
-            document.getElementById('discoverCards').innerHTML = `
-                <div class="card" style="text-align: center; padding: 2rem;">
-                    <div style="font-size: 4rem;">🐰</div>
-                    <h3>No one else here yet!</h3>
-                    <p style="color: #666;">Be the first tonight 🔥</p>
-                </div>
-            `;
-            return;
-        }
-        
-        const cards = [];
+        allUsers = [];
         for (const checkin of checkins) {
             const user = checkin.users;
-            if (!user || !user.gender) continue;
+            
+            if (currentUser.gender === 'male' && user.gender !== 'female') continue;
+            if (currentUser.gender === 'female' && user.gender !== 'male') continue;
             
             const photosRes = await fetch(`${API_URL}/photos?user_id=${user.id}&is_primary=true&limit=1`);
             const photos = await photosRes.json();
-            const photoUrl = photos && photos[0] ? photos[0].photo_url : null;
             
-            cards.push(`
-                <div class="profile-card" data-user-id="${user.id}">
-                    <div class="card-image">
-                        ${photoUrl ? `<img src="${photoUrl}" alt="${user.name}">` : '<span style="font-size: 4rem;">👤</span>'}
-                        <div class="card-badge">Here Now 🔴</div>
-                        <div class="card-table">Table ${checkin.table_number}</div>
-                    </div>
-                    <div class="card-info">
-                        <div class="card-name">${user.name}, ${user.age}</div>
-                        <div class="card-details">${user.gender === 'male' ? '♂️' : '♀️'} • ${user.bio || 'Hey there!'}</div>
-                        ${user.preferred_drink ? `<div style="margin: 0.5rem 0;">🍹 ${user.preferred_drink}</div>` : ''}
-                        ${user.hobbies && user.hobbies.length > 0 ? `
-                            <div class="card-hobbies">
-                                ${user.hobbies.map(h => `<span class="hobby-tag">${h}</span>`).join('')}
-                            </div>
-                        ` : ''}
-                        <div class="swipe-actions">
-                            <button class="swipe-btn btn-pass" onclick="swipe('${user.id}', false)">✕</button>
-                            <button class="swipe-btn btn-drink" onclick="sendDrink('${user.id}')">🍹</button>
-                            <button class="swipe-btn btn-like" onclick="swipe('${user.id}', true)">❤️</button>
-                        </div>
-                    </div>
-                </div>
-            `);
+            allUsers.push({
+                ...user,
+                table: checkin.table_number,
+                photo: photos && photos[0] ? photos[0].photo_url : null
+            });
         }
         
-        document.getElementById('discoverCards').innerHTML = cards.join('');
+        currentSwipeIndex = 0;
+        renderSwipeCard();
     } catch (error) {
         console.error('Load singles error:', error);
     }
 }
 
-// Swipe
-async function swipe(userId, liked) {
+function renderSwipeCard() {
+    const container = document.getElementById('discoverCards');
+    
+    if (allUsers.length === 0) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">🐰</div>
+                <h3>No one else here yet!</h3>
+                <p style="color: #666;">Be the first tonight 🔥</p>
+            </div>
+        `;
+        return;
+    }
+    
+    if (currentSwipeIndex >= allUsers.length) {
+        container.innerHTML = `
+            <div class="empty-state">
+                <div class="empty-icon">✨</div>
+                <h3>You've seen everyone!</h3>
+                <p style="color: #666;">Check back later</p>
+            </div>
+        `;
+        return;
+    }
+    
+    const user = allUsers[currentSwipeIndex];
+    
+    container.innerHTML = `
+        <div class="profile-card" id="swipeCard">
+            <div class="card-image">
+                ${user.photo ? `<img src="${user.photo}">` : `<div style="font-size:5rem;">${user.gender === 'male' ? '♂️' : '♀️'}</div>`}
+                <div class="card-badge">Here Now 🔴</div>
+                <div class="card-table">Table ${user.table}</div>
+                <div class="swipe-overlay" id="swipeOverlay"></div>
+            </div>
+            <div class="card-info">
+                <div class="card-name">${user.name}, ${user.age}</div>
+                <div class="card-details">${user.bio || 'Hey there! 👋'}</div>
+                ${user.preferred_drink ? `<div class="card-details">🍹 ${user.preferred_drink}</div>` : ''}
+                ${user.hobbies && user.hobbies.length > 0 ? `
+                    <div class="card-hobbies">
+                        ${user.hobbies.map(h => `<span class="hobby-pill">${h}</span>`).join('')}
+                    </div>
+                ` : ''}
+            </div>
+        </div>
+        <div class="swipe-actions">
+            <button class="swipe-btn btn-pass" onclick="swipe(false)">✕</button>
+            <button class="swipe-btn btn-like" onclick="swipe(true)">❤️</button>
+        </div>
+    `;
+    
+    setupSwipeGestures();
+}
+
+function setupSwipeGestures() {
+    currentCard = document.getElementById('swipeCard');
+    if (!currentCard) return;
+    
+    currentCard.addEventListener('touchstart', handleTouchStart);
+    currentCard.addEventListener('touchmove', handleTouchMove);
+    currentCard.addEventListener('touchend', handleTouchEnd);
+    
+    currentCard.addEventListener('mousedown', handleTouchStart);
+    currentCard.addEventListener('mousemove', handleTouchMove);
+    currentCard.addEventListener('mouseup', handleTouchEnd);
+}
+
+function handleTouchStart(e) {
+    isDragging = true;
+    swipeStartX = e.touches ? e.touches[0].clientX : e.clientX;
+}
+
+function handleTouchMove(e) {
+    if (!isDragging) return;
+    
+    const currentX = e.touches ? e.touches[0].clientX : e.clientX;
+    const diffX = currentX - swipeStartX;
+    
+    currentCard.style.transform = `translateX(${diffX}px) rotate(${diffX * 0.1}deg)`;
+    
+    const overlay = document.getElementById('swipeOverlay');
+    if (diffX < -50) {
+        overlay.className = 'swipe-overlay nope';
+        overlay.textContent = 'NOPE';
+    } else if (diffX > 50) {
+        overlay.className = 'swipe-overlay like';
+        overlay.textContent = 'LIKE';
+    } else {
+        overlay.className = 'swipe-overlay';
+    }
+}
+
+function handleTouchEnd(e) {
+    if (!isDragging) return;
+    isDragging = false;
+    
+    const currentX = e.changedTouches ? e.changedTouches[0].clientX : e.clientX;
+    const diffX = currentX - swipeStartX;
+    
+    if (Math.abs(diffX) > 100) {
+        swipe(diffX > 0);
+    } else {
+        currentCard.style.transform = '';
+        document.getElementById('swipeOverlay').className = 'swipe-overlay';
+    }
+}
+
+async function swipe(liked) {
+    const user = allUsers[currentSwipeIndex];
+    
     try {
         const response = await fetch(`${API_URL}/matches`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 user1_id: currentUser.id,
-                user2_id: userId,
+                user2_id: user.id,
                 liked
             })
         });
         
-        const data = await response.json();
+        const result = await response.json();
         
-        if (data.new_match) {
-            alert('💕 It\'s a Match!');
-        }
-        
-        // Remove card
-        const card = document.querySelector(`[data-user-id="${userId}"]`);
-        if (card) card.remove();
-        
-        // Reload if no more cards
-        if (document.querySelectorAll('.profile-card').length === 0) {
-            loadSingles();
+        if (result.new_match) {
+            showMatchModal(user);
         }
     } catch (error) {
         console.error('Swipe error:', error);
     }
-}
-
-// Send drink (TON payment)
-async function sendDrink(userId) {
-    alert('🍹 TON Payment feature coming soon! Connect your TON wallet to send drinks.');
-    // TODO: Implement TON Connect integration
-}
-
-// Show section
-function showSection(name) {
-    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-    document.getElementById(name + 'Section').classList.add('active');
     
-    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
-    const navItems = document.querySelectorAll('.nav-item');
-    if (name === 'discover' && navItems[0]) navItems[0].classList.add('active');
-    if (name === 'matches' && navItems[1]) navItems[1].classList.add('active');
-    if (name === 'chat' && navItems[2]) navItems[2].classList.add('active');
-    if (name === 'profile' && navItems[3]) navItems[3].classList.add('active');
-    
-    if (name === 'discover') loadSingles();
-    if (name === 'matches') loadMatches();
-    if (name === 'chat') loadConversations();
-    if (name === 'profile') loadProfile();
+    currentSwipeIndex++;
+    renderSwipeCard();
 }
 
-// Load matches
+function showMatchModal(user) {
+    const myPhoto = userPhotos[0]?.photo_url;
+    const theirPhoto = user.photo;
+    
+    document.getElementById('matchAvatars').innerHTML = `
+        <div class="match-avatar">
+            ${myPhoto ? `<img src="${myPhoto}">` : '👤'}
+        </div>
+        <div class="match-avatar">
+            ${theirPhoto ? `<img src="${theirPhoto}">` : '👤'}
+        </div>
+    `;
+    
+    document.getElementById('matchModal').classList.add('active');
+}
+
+function closeMatchModal() {
+    document.getElementById('matchModal').classList.remove('active');
+}
+
 async function loadMatches() {
     try {
         const response = await fetch(`${API_URL}/matches?user_id=${currentUser.id}`);
@@ -947,8 +1253,8 @@ async function loadMatches() {
         
         if (matches.length === 0) {
             document.getElementById('matchesList').innerHTML = `
-                <div class="card" style="text-align: center; padding: 2rem;">
-                    <div style="font-size: 4rem;">💕</div>
+                <div class="empty-state">
+                    <div class="empty-icon">💕</div>
                     <h3>No matches yet!</h3>
                     <p style="color: #666;">Keep swiping to find your match!</p>
                 </div>
@@ -956,18 +1262,19 @@ async function loadMatches() {
             return;
         }
         
-        const html = matches.map(match => {
+        let html = '';
+        for (const match of matches) {
             const otherUser = match.user1.id === currentUser.id ? match.user2 : match.user1;
-            return `
-                <div class="chat-item" onclick="openChat('${otherUser.id}')">
-                    <div class="chat-avatar">👤</div>
-                    <div class="chat-content">
-                        <div class="chat-name">${otherUser.name}, ${otherUser.age}</div>
-                        <div class="chat-preview">💕 Matched!</div>
+            html += `
+                <div class="person-card">
+                    <div class="person-avatar">${otherUser.gender === 'male' ? '♂️' : '♀️'}</div>
+                    <div class="person-info">
+                        <div class="person-name">${otherUser.name}, ${otherUser.age}</div>
+                        <div class="person-details">💕 Matched!</div>
                     </div>
                 </div>
             `;
-        }).join('');
+        }
         
         document.getElementById('matchesList').innerHTML = html;
     } catch (error) {
@@ -975,134 +1282,68 @@ async function loadMatches() {
     }
 }
 
-// Chat functions
-async function loadConversations() {
-    const response = await fetch(`${API_URL}/matches?user_id=${currentUser.id}`);
-    const matches = await response.json();
-    
-    if (matches.length === 0) {
-        document.getElementById('conversations').innerHTML = `
-            <div class="card" style="text-align: center; padding: 2rem;">
-                <div style="font-size: 4rem;">💬</div>
-                <h3>No conversations yet!</h3>
-                <p style="color: #666;">Match with someone to start chatting!</p>
-            </div>
-        `;
-        return;
-    }
-    
-    const html = matches.map(match => {
-        const otherUser = match.user1.id === currentUser.id ? match.user2 : match.user1;
-        return `
-            <div class="chat-item" onclick="openChat('${otherUser.id}', '${otherUser.name}')">
-                <div class="chat-avatar">👤</div>
-                <div class="chat-content">
-                    <div class="chat-name">${otherUser.name}</div>
-                    <div class="chat-preview">Start chatting...</div>
-                </div>
-            </div>
-        `;
-    }).join('');
-    
-    document.getElementById('conversations').innerHTML = html;
-}
-
-async function openChat(userId, userName) {
-    currentChatUser = { id: userId, name: userName };
-    document.getElementById('chatList').style.display = 'none';
-    document.getElementById('chatWindow').style.display = 'block';
-    loadMessages();
-}
-
-function backToChats() {
-    document.getElementById('chatList').style.display = 'block';
-    document.getElementById('chatWindow').style.display = 'none';
-    currentChatUser = null;
-}
-
-async function loadMessages() {
-    const response = await fetch(`${API_URL}/messages?user1_id=${currentUser.id}&user2_id=${currentChatUser.id}`);
-    const messages = await response.json();
-    
-    const html = messages.map(msg => `
-        <div class="message ${msg.sender_id === currentUser.id ? 'sent' : 'received'}">
-            <div class="message-content">${msg.message}</div>
-        </div>
-    `).join('');
-    
-    document.getElementById('messages').innerHTML = html || '<p style="text-align: center; color: #999;">No messages yet. Say hi!</p>';
-    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
-}
-
-async function sendMessage() {
-    const input = document.getElementById('messageInput');
-    const message = input.value.trim();
-    
-    if (!message) return;
-    
-    await fetch(`${API_URL}/messages`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            sender_id: currentUser.id,
-            receiver_id: currentChatUser.id,
-            message
-        })
-    });
-    
-    input.value = '';
-    loadMessages();
-}
-
-// Load profile
 async function loadProfile() {
-    const photoUrl = userPhotos[0]?.photo_url || null;
+    const photo = userPhotos[0]?.photo_url;
     document.getElementById('profileView').innerHTML = `
         <div class="profile-card">
             <div class="card-image">
-                ${photoUrl ? `<img src="${photoUrl}" alt="${currentUser.name}">` : '<span style="font-size: 4rem;">👤</span>'}
+                ${photo ? `<img src="${photo}">` : '<div style="font-size:5rem;">👤</div>'}
                 <div class="card-badge">Here Now 🔴</div>
             </div>
             <div class="card-info">
                 <div class="card-name">${currentUser.name}, ${currentUser.age}</div>
                 <div class="card-details">${currentUser.gender === 'male' ? '♂️' : '♀️'} • ${currentUser.bio || ''}</div>
-                ${currentUser.preferred_drink ? `<div style="margin: 0.5rem 0;">🍹 ${currentUser.preferred_drink}</div>` : ''}
+                ${currentUser.preferred_drink ? `<div class="card-details">🍹 ${currentUser.preferred_drink}</div>` : ''}
                 ${currentUser.hobbies && currentUser.hobbies.length > 0 ? `
                     <div class="card-hobbies">
-                        ${currentUser.hobbies.map(h => `<span class="hobby-tag">${h}</span>`).join('')}
+                        ${currentUser.hobbies.map(h => `<span class="hobby-pill">${h}</span>`).join('')}
                     </div>
                 ` : ''}
             </div>
         </div>
-        <button class="btn btn-secondary" style="margin-top: 1rem;" onclick="checkOut()">🚪 Check Out</button>
+        <button class="btn btn-secondary" style="margin-top: 1rem;" onclick="editProfile()">✏️ Edit Profile</button>
     `;
 }
 
-async function checkOut() {
-    if (!confirm('Check out from the bar?')) return;
-    const response = await fetch(`${API_URL}/checkins?user_id=${currentUser.id}&is_active=true`);
-    const checkins = await response.json();
-    if (checkins[0]) {
-        await fetch(`${API_URL}/checkins/${checkins[0].id}`, {
-            method: 'PATCH',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ is_active: false })
-        });
-    }
-    document.getElementById('tableNumber').textContent = '--';
-    document.getElementById('bottomNav').classList.remove('active');
-    showSection('welcome');
+function editProfile() {
+    // Pre-fill form with current data
+    document.getElementById('inputName').value = currentUser.name || '';
+    document.getElementById('inputAge').value = currentUser.age || '';
+    document.getElementById('inputGender').value = currentUser.gender || '';
+    document.getElementById('inputBio').value = currentUser.bio || '';
+    document.getElementById('inputDrink').value = currentUser.preferred_drink || '';
+    
+    // Pre-check hobbies
+    document.querySelectorAll('.checkbox-item input').forEach(cb => {
+        cb.checked = currentUser.hobbies && currentUser.hobbies.includes(cb.value);
+    });
+    
+    // Show photos
+    renderPhotoGallery();
+    
+    // Go to profile setup section
+    showSection('profileSetup');
 }
 
-// Start
-init();
+function showSection(name) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    document.getElementById(name + 'Section').classList.add('active');
+    
+    document.querySelectorAll('.nav-item').forEach(item => item.classList.remove('active'));
+    const navItems = document.querySelectorAll('.nav-item');
+    if (name === 'tableMap' && navItems[0]) navItems[0].classList.add('active');
+    if (name === 'discover' && navItems[1]) navItems[1].classList.add('active');
+    if (name === 'matches' && navItems[2]) navItems[2].classList.add('active');
+    if (name === 'profile' && navItems[3]) navItems[3].classList.add('active');
+    
+    if (name === 'tableMap') loadTableMap();
+    if (name === 'discover') loadSingles();
+    if (name === 'matches') loadMatches();
+    if (name === 'profile') loadProfile();
+}
 
-// Auto-refresh singles every 30 seconds
-setInterval(() => {
-    if (document.getElementById('discoverSection').classList.contains('active')) {
-        loadSingles();
-    }
-}, 30000);
+init();
+setInterval(updateOnlineCount, 30000);
 </script>
 
 </body>
