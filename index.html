@@ -724,6 +724,20 @@
                 <div class="checkbox-item"><input type="checkbox" value="Photography"> Photography</div>
             </div>
             
+            <label>🪑 Table Number (Optional)</label>
+            <select id="inputTable">
+                <option value="">No Table (Bar/Standing)</option>
+                <option value="1">Table 1</option>
+                <option value="2">Table 2</option>
+                <option value="3">Table 3</option>
+                <option value="4">Table 4</option>
+                <option value="5">Table 5</option>
+                <option value="6">Table 6</option>
+                <option value="7">Table 7</option>
+                <option value="8">Table 8</option>
+                <option value="9">Table 9</option>
+            </select>
+            
             <button class="btn" onclick="saveProfile()">✅ Save & Start Matching</button>
         </div>
     </div>
@@ -746,10 +760,49 @@
         <div id="discoverCards"></div>
     </div>
 
+    <!-- Events Section -->
+    <div id="eventsSection" class="section">
+        <h2 style="margin-bottom: 1rem;">🎟️ Upcoming Events</h2>
+        <div id="eventsList"></div>
+        <button class="btn btn-secondary" style="margin-top: 1rem;" onclick="showCreateEventForm()">+ Create Event</button>
+    </div>
+
+    <!-- Event Detail Section -->
+    <div id="eventDetailSection" class="section">
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <div style="padding: 1rem; background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%); color: white; display: flex; align-items: center; gap: 1rem;">
+                <button onclick="showSection('events')" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0;">←</button>
+                <div style="font-weight: 700; font-size: 1.2rem;">Event Details</div>
+            </div>
+            <div id="eventDetailContent" style="padding: 1.5rem;"></div>
+        </div>
+    </div>
+
     <!-- Matches Section -->
     <div id="matchesSection" class="section">
         <h2 style="margin-bottom: 1rem;">💕 Your Matches</h2>
         <div id="matchesList"></div>
+    </div>
+
+    <!-- Chats Section -->
+    <div id="chatsSection" class="section">
+        <h2 style="margin-bottom: 1rem;">💬 Your Chats</h2>
+        <div id="chatsList"></div>
+    </div>
+
+    <!-- Chat Room Section -->
+    <div id="chatRoomSection" class="section">
+        <div class="card" style="padding: 0; overflow: hidden;">
+            <div style="padding: 1rem; background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%); color: white; display: flex; align-items: center; gap: 1rem;">
+                <button onclick="showSection('chats')" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer; padding: 0;">←</button>
+                <div id="chatHeader"></div>
+            </div>
+            <div id="chatMessages" style="height: 60vh; overflow-y: auto; padding: 1rem; background: #f9f9f9;"></div>
+            <div style="padding: 1rem; background: white; border-top: 1px solid #eee; display: flex; gap: 0.5rem;">
+                <input type="text" id="messageInput" placeholder="Type a message..." style="flex: 1; padding: 0.8rem; border: 1px solid #ddd; border-radius: 25px; outline: none;">
+                <button onclick="sendMessage()" class="btn" style="border-radius: 50%; width: 45px; height: 45px; padding: 0; display: flex; align-items: center; justify-content: center;">✉️</button>
+            </div>
+        </div>
     </div>
 
     <!-- Profile Section -->
@@ -776,8 +829,19 @@
         <h1 class="match-title">IT'S A MATCH! 🎉</h1>
         <p class="match-subtitle">You both liked each other!</p>
         <div class="match-avatars" id="matchAvatars"></div>
-        <button class="btn" style="background: white; color: #FF0000;" onclick="closeMatchModal()">💬 Send Message</button>
+        <button class="btn" style="background: white; color: #FF0000;" onclick="sendMessageToMatch()">💬 Send Message</button>
         <button class="btn" style="margin-top: 1rem; background: rgba(255,255,255,0.2);" onclick="closeMatchModal()">Keep Swiping</button>
+    </div>
+</div>
+
+<!-- Profile Detail Modal -->
+<div class="modal" id="profileModal">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2>Profile</h2>
+            <button class="modal-close" onclick="closeProfileModal()">×</button>
+        </div>
+        <div id="profileModalContent"></div>
     </div>
 </div>
 
@@ -790,6 +854,14 @@
     <div class="nav-item active" onclick="showSection('discover')">
         <div class="nav-icon">🔥</div>
         <div class="nav-label">Discover</div>
+    </div>
+    <div class="nav-item" onclick="showSection('events')">
+        <div class="nav-icon">🎟️</div>
+        <div class="nav-label">Events</div>
+    </div>
+    <div class="nav-item" onclick="showSection('chats')">
+        <div class="nav-icon">💬</div>
+        <div class="nav-label">Chats</div>
     </div>
     <div class="nav-item" onclick="showSection('matches')">
         <div class="nav-icon">💕</div>
@@ -955,6 +1027,7 @@ async function saveProfile() {
     const bio = document.getElementById('inputBio').value.trim();
     const drink = document.getElementById('inputDrink').value;
     const hobbies = Array.from(document.querySelectorAll('.checkbox-item input:checked')).map(cb => cb.value);
+    const tableNumber = document.getElementById('inputTable').value;
     
     if (!name || !age || !gender || userPhotos.length === 0) {
         alert('Please add photo, name, age, and gender!');
@@ -968,6 +1041,33 @@ async function saveProfile() {
     });
     
     currentUser = { ...currentUser, name, age, gender, bio, preferred_drink: drink, hobbies };
+    
+    // Create check-in with selected table (or null for no table)
+    if (tableNumber) {
+        await fetch(`${API_URL}/checkins`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: currentUser.id,
+                table_number: parseInt(tableNumber),
+                is_active: true
+            })
+        });
+        document.getElementById('tableNumber').textContent = tableNumber;
+    } else {
+        // No table - create check-in with table 0 or special indicator
+        await fetch(`${API_URL}/checkins`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user_id: currentUser.id,
+                table_number: 0, // 0 = no table / bar area
+                is_active: true
+            })
+        });
+        document.getElementById('tableNumber').textContent = 'Bar';
+    }
+    
     document.getElementById('bottomNav').classList.add('active');
     
     // If user is editing (already has bottom nav), go back to profile
@@ -1037,7 +1137,7 @@ async function showTableDetail(tableNum) {
             const photo = photos && photos[0] ? photos[0].photo_url : null;
             
             html += `
-                <div class="person-card" onclick="closeTableModal(); showSection('discover');">
+                <div class="person-card" onclick="closeTableModal(); showUserProfile(${user.id});">
                     <div class="person-avatar">
                         ${photo ? `<img src="${photo}">` : (user.gender === 'male' ? '♂️' : '♀️')}
                     </div>
@@ -1230,6 +1330,9 @@ function showMatchModal(user) {
     const myPhoto = userPhotos[0]?.photo_url;
     const theirPhoto = user.photo;
     
+    // Save matched user for chat
+    lastMatchedUser = { id: user.id, name: user.name };
+    
     document.getElementById('matchAvatars').innerHTML = `
         <div class="match-avatar">
             ${myPhoto ? `<img src="${myPhoto}">` : '👤'}
@@ -1333,16 +1436,439 @@ function showSection(name) {
     const navItems = document.querySelectorAll('.nav-item');
     if (name === 'tableMap' && navItems[0]) navItems[0].classList.add('active');
     if (name === 'discover' && navItems[1]) navItems[1].classList.add('active');
-    if (name === 'matches' && navItems[2]) navItems[2].classList.add('active');
-    if (name === 'profile' && navItems[3]) navItems[3].classList.add('active');
+    if (name === 'events' && navItems[2]) navItems[2].classList.add('active');
+    if (name === 'chats' && navItems[3]) navItems[3].classList.add('active');
+    if (name === 'matches' && navItems[4]) navItems[4].classList.add('active');
+    if (name === 'profile' && navItems[5]) navItems[5].classList.add('active');
     
     if (name === 'tableMap') loadTableMap();
     if (name === 'discover') loadSingles();
+    if (name === 'events') loadEvents();
+    if (name === 'chats') loadChats();
     if (name === 'matches') loadMatches();
     if (name === 'profile') loadProfile();
 }
 
+// Notification System
+let notificationPermission = false;
+
+async function requestNotificationPermission() {
+    if ('Notification' in window && Notification.permission === 'default') {
+        const permission = await Notification.requestPermission();
+        notificationPermission = permission === 'granted';
+    } else if (Notification.permission === 'granted') {
+        notificationPermission = true;
+    }
+}
+
+function showNotification(title, body, data = {}) {
+    if (!notificationPermission) return;
+    
+    try {
+        if (tg && tg.showAlert) {
+            // Telegram notification
+            tg.showAlert(body);
+        } else if ('Notification' in window && Notification.permission === 'granted') {
+            // Browser notification
+            new Notification(title, {
+                body: body,
+                icon: 'data:image/svg+xml,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="48" fill="white"/><circle cx="50" cy="55" r="25" fill="%23FF0000"/></svg>',
+                badge: 'data:image/svg+xml,<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><circle cx="50" cy="50" r="48" fill="%23FF0000"/></svg>',
+                tag: data.tag || 'red-bunny',
+                requireInteraction: false
+            });
+        }
+    } catch (error) {
+        console.error('Notification error:', error);
+    }
+}
+
+// Events System
+async function loadEvents() {
+    try {
+        const response = await fetch(`${API_URL}/events`);
+        const events = await response.json();
+        
+        if (!events || events.length === 0) {
+            document.getElementById('eventsList').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">🎟️</div>
+                    <p>No upcoming events!</p>
+                    <p style="color: #999; font-size: 0.9rem;">Check back soon for Red Bunny parties</p>
+                </div>
+            `;
+            return;
+        }
+        
+        let html = '';
+        for (const event of events) {
+            const eventDate = new Date(event.event_date);
+            const isUpcoming = eventDate > new Date();
+            
+            html += `
+                <div class="card" onclick="showEventDetail(${event.id})" style="cursor: pointer; margin-bottom: 1rem; ${!isUpcoming ? 'opacity: 0.6;' : ''}">
+                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                        <div>
+                            <h3 style="margin: 0 0 0.5rem 0; color: #FF0000;">${event.title}</h3>
+                            <div style="color: #666; font-size: 0.9rem;">
+                                📅 ${eventDate.toLocaleDateString()} at ${eventDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                            </div>
+                        </div>
+                        ${isUpcoming ? '<div style="background: #FF0000; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">UPCOMING</div>' : '<div style="background: #999; color: white; padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.8rem;">PAST</div>'}
+                    </div>
+                    <p style="color: #666; margin: 0;">${event.description || 'Red Bunny Event'}</p>
+                    ${event.attendee_count ? `<div style="margin-top: 0.8rem; color: #FF0000; font-weight: 600;">${event.attendee_count} attending</div>` : ''}
+                </div>
+            `;
+        }
+        
+        document.getElementById('eventsList').innerHTML = html;
+    } catch (error) {
+        console.error('Load events error:', error);
+    }
+}
+
+async function showEventDetail(eventId) {
+    try {
+        const response = await fetch(`${API_URL}/events/${eventId}`);
+        const event = await response.json();
+        
+        const eventDate = new Date(event.event_date);
+        const isUpcoming = eventDate > new Date();
+        
+        // Get RSVPs
+        const rsvpRes = await fetch(`${API_URL}/event-rsvps?event_id=${eventId}`);
+        const rsvps = await rsvpRes.json() || [];
+        
+        const userRsvp = rsvps.find(r => r.user_id === currentUser.id);
+        
+        let attendeesHtml = '';
+        if (rsvps.length > 0) {
+            attendeesHtml = '<h4 style="margin: 1.5rem 0 1rem 0;">Who\'s Coming:</h4>';
+            for (const rsvp of rsvps.slice(0, 10)) {
+                const userRes = await fetch(`${API_URL}/users/${rsvp.user_id}`);
+                const user = await userRes.json();
+                const photosRes = await fetch(`${API_URL}/photos?user_id=${user.id}&is_primary=true`);
+                const photos = await photosRes.json();
+                const photo = photos && photos[0] ? photos[0].photo_url : null;
+                
+                attendeesHtml += `
+                    <div style="display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem; background: #f9f9f9; border-radius: 12px; margin-bottom: 0.5rem;">
+                        <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: #ddd;">
+                            ${photo ? `<img src="${photo}" style="width: 100%; height: 100%; object-fit: cover;">` : '👤'}
+                        </div>
+                        <div style="font-weight: 600;">${user.name}, ${user.age}</div>
+                    </div>
+                `;
+            }
+            if (rsvps.length > 10) {
+                attendeesHtml += `<p style="color: #666; text-align: center; margin-top: 0.5rem;">+${rsvps.length - 10} more attending</p>`;
+            }
+        }
+        
+        document.getElementById('eventDetailContent').innerHTML = `
+            <h2 style="margin: 0 0 1rem 0; color: #FF0000;">${event.title}</h2>
+            <div style="background: #f9f9f9; padding: 1rem; border-radius: 12px; margin-bottom: 1rem;">
+                <div style="margin-bottom: 0.5rem;"><strong>📅 Date:</strong> ${eventDate.toLocaleDateString()}</div>
+                <div style="margin-bottom: 0.5rem;"><strong>🕐 Time:</strong> ${eventDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                <div><strong>📍 Location:</strong> Red Bunny Bar</div>
+            </div>
+            <p style="line-height: 1.6; color: #666;">${event.description || 'Join us for an amazing night at Red Bunny!'}</p>
+            <div style="margin: 1.5rem 0;">
+                <strong style="color: #FF0000; font-size: 1.2rem;">${rsvps.length} people attending</strong>
+            </div>
+            ${isUpcoming ? `
+                <button class="btn" onclick="toggleRsvp(${eventId}, ${userRsvp ? true : false})" style="width: 100%;">
+                    ${userRsvp ? '✅ You\'re Going!' : '🎟️ RSVP for Event'}
+                </button>
+            ` : '<div style="text-align: center; padding: 1rem; background: #f0f0f0; border-radius: 12px; color: #999;">This event has ended</div>'}
+            ${attendeesHtml}
+        `;
+        
+        showSection('eventDetail');
+    } catch (error) {
+        console.error('Show event detail error:', error);
+    }
+}
+
+async function toggleRsvp(eventId, isCurrentlyGoing) {
+    try {
+        if (isCurrentlyGoing) {
+            // Cancel RSVP
+            await fetch(`${API_URL}/event-rsvps?event_id=${eventId}&user_id=${currentUser.id}`, {
+                method: 'DELETE'
+            });
+        } else {
+            // Create RSVP
+            await fetch(`${API_URL}/event-rsvps`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    event_id: eventId,
+                    user_id: currentUser.id
+                })
+            });
+        }
+        
+        // Reload event detail
+        showEventDetail(eventId);
+    } catch (error) {
+        console.error('Toggle RSVP error:', error);
+        alert('Failed to update RSVP');
+    }
+}
+
+function showCreateEventForm() {
+    alert('Event creation coming soon! Contact admin to create events.');
+}
+
+// Profile Modal Functions
+async function showUserProfile(userId) {
+    try {
+        const userRes = await fetch(`${API_URL}/users/${userId}`);
+        const user = await userRes.json();
+        
+        const photosRes = await fetch(`${API_URL}/photos?user_id=${userId}`);
+        const photos = await photosRes.json() || [];
+        
+        let photosHtml = '';
+        if (photos.length > 0) {
+            photosHtml = photos.map(photo => `
+                <img src="${photo.photo_url}" style="width: 100%; border-radius: 12px; margin-bottom: 0.5rem;">
+            `).join('');
+        }
+        
+        document.getElementById('profileModalContent').innerHTML = `
+            ${photosHtml}
+            <h2 style="margin: 1rem 0 0.5rem 0;">${user.name}, ${user.age}</h2>
+            <div style="color: #666; margin-bottom: 1rem;">${user.gender === 'male' ? '♂️ Male' : '♀️ Female'}</div>
+            ${user.bio ? `<p style="line-height: 1.6; margin-bottom: 1rem;">${user.bio}</p>` : ''}
+            ${user.preferred_drink ? `<div style="margin-bottom: 0.5rem;">🍹 ${user.preferred_drink}</div>` : ''}
+            ${user.hobbies && user.hobbies.length > 0 ? `
+                <div style="margin-top: 1rem;">
+                    <strong>Interests:</strong>
+                    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 0.5rem;">
+                        ${user.hobbies.map(h => `<span style="background: #f0f0f0; padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.9rem;">${h}</span>`).join('')}
+                    </div>
+                </div>
+            ` : ''}
+            <button class="btn" onclick="likeUserFromProfile(${userId})" style="width: 100%; margin-top: 1.5rem;">
+                ❤️ Like ${user.name}
+            </button>
+        `;
+        
+        document.getElementById('profileModal').classList.add('active');
+    } catch (error) {
+        console.error('Show user profile error:', error);
+    }
+}
+
+function closeProfileModal() {
+    document.getElementById('profileModal').classList.remove('active');
+}
+
+async function likeUserFromProfile(userId) {
+    try {
+        const response = await fetch(`${API_URL}/matches`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                user1_id: currentUser.id,
+                user2_id: userId,
+                liked: true
+            })
+        });
+        
+        const result = await response.json();
+        
+        if (result.new_match) {
+            closeProfileModal();
+            const userRes = await fetch(`${API_URL}/users/${userId}`);
+            const user = await userRes.json();
+            showMatchModal({...user, id: userId});
+            showNotification('New Match! 🎉', `You matched with ${user.name}!`);
+        } else {
+            closeProfileModal();
+            alert('Like sent! ❤️');
+        }
+    } catch (error) {
+        console.error('Like user error:', error);
+        alert('Failed to send like');
+    }
+}
+
+// Chat System Variables
+let currentChatUser = null;
+let chatMessages = [];
+let chatPollInterval = null;
+let lastMatchedUser = null;
+
+async function loadChats() {
+    try {
+        // Get all matches
+        const matchesRes = await fetch(`${API_URL}/matches?user_id=${currentUser.id}`);
+        const matches = await matchesRes.json();
+        
+        if (!matches || matches.length === 0) {
+            document.getElementById('chatsList').innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-icon">💬</div>
+                    <p>No chats yet!</p>
+                    <p style="color: #999; font-size: 0.9rem;">Match with someone to start chatting</p>
+                </div>
+            `;
+            return;
+        }
+        
+        // For each match, get the other user's info and last message
+        let html = '';
+        for (const match of matches) {
+            const otherUserId = match.user1_id === currentUser.id ? match.user2_id : match.user1_id;
+            const userRes = await fetch(`${API_URL}/users/${otherUserId}`);
+            const user = await userRes.json();
+            
+            const photosRes = await fetch(`${API_URL}/photos?user_id=${user.id}&is_primary=true`);
+            const photos = await photosRes.json();
+            const photo = photos && photos.length > 0 ? photos[0].photo_url : null;
+            
+            html += `
+                <div class="card" onclick="openChat(${user.id}, '${user.name}')" style="cursor: pointer; margin-bottom: 1rem;">
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div style="width: 60px; height: 60px; border-radius: 50%; overflow: hidden; background: #f0f0f0; flex-shrink: 0;">
+                            ${photo ? `<img src="${photo}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; font-size: 2rem;">👤</div>'}
+                        </div>
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 1.1rem;">${user.name}, ${user.age}</div>
+                            <div style="color: #999; font-size: 0.9rem;">Tap to chat</div>
+                        </div>
+                        <div style="color: #FF0000;">→</div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        document.getElementById('chatsList').innerHTML = html;
+    } catch (error) {
+        console.error('Load chats error:', error);
+    }
+}
+
+function sendMessageToMatch() {
+    if (lastMatchedUser) {
+        closeMatchModal();
+        openChat(lastMatchedUser.id, lastMatchedUser.name);
+    }
+}
+
+async function openChat(userId, userName) {
+    currentChatUser = { id: userId, name: userName };
+    
+    // Load user's photo
+    const photosRes = await fetch(`${API_URL}/photos?user_id=${userId}&is_primary=true`);
+    const photos = await photosRes.json();
+    const photo = photos && photos.length > 0 ? photos[0].photo_url : null;
+    
+    document.getElementById('chatHeader').innerHTML = `
+        <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="width: 40px; height: 40px; border-radius: 50%; overflow: hidden; background: white;">
+                ${photo ? `<img src="${photo}" style="width: 100%; height: 100%; object-fit: cover;">` : '<div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center;">👤</div>'}
+            </div>
+            <div style="font-weight: 600; font-size: 1.1rem;">${userName}</div>
+        </div>
+    `;
+    
+    showSection('chatRoom');
+    loadMessages();
+    
+    // Poll for new messages every 3 seconds
+    if (chatPollInterval) clearInterval(chatPollInterval);
+    chatPollInterval = setInterval(loadMessages, 3000);
+}
+
+async function loadMessages() {
+    if (!currentChatUser) return;
+    
+    try {
+        const response = await fetch(`${API_URL}/messages?user_id=${currentUser.id}&other_user_id=${currentChatUser.id}`);
+        const newMessages = await response.json() || [];
+        
+        // Check for new messages and notify
+        if (chatMessages.length > 0 && newMessages.length > chatMessages.length) {
+            const latestMsg = newMessages[newMessages.length - 1];
+            if (latestMsg.sender_id !== currentUser.id) {
+                showNotification('New Message 💬', `${currentChatUser.name}: ${latestMsg.content}`);
+            }
+        }
+        
+        chatMessages = newMessages;
+        
+        const messagesHtml = chatMessages.map(msg => {
+            const isMine = msg.sender_id === currentUser.id;
+            return `
+                <div style="display: flex; justify-content: ${isMine ? 'flex-end' : 'flex-start'}; margin-bottom: 1rem;">
+                    <div style="max-width: 70%; background: ${isMine ? '#FF0000' : 'white'}; color: ${isMine ? 'white' : '#000'}; padding: 0.8rem 1rem; border-radius: 18px; ${isMine ? 'border-bottom-right-radius: 4px;' : 'border-bottom-left-radius: 4px;'} box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                        <div style="word-wrap: break-word;">${msg.content}</div>
+                        <div style="font-size: 0.7rem; margin-top: 0.3rem; opacity: 0.7;">${new Date(msg.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+        
+        document.getElementById('chatMessages').innerHTML = messagesHtml || `
+            <div class="empty-state">
+                <div class="empty-icon">💬</div>
+                <p>Start the conversation!</p>
+            </div>
+        `;
+        
+        // Scroll to bottom
+        const chatContainer = document.getElementById('chatMessages');
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    } catch (error) {
+        console.error('Load messages error:', error);
+    }
+}
+
+async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const content = input.value.trim();
+    
+    if (!content || !currentChatUser) return;
+    
+    try {
+        await fetch(`${API_URL}/messages`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                sender_id: currentUser.id,
+                receiver_id: currentChatUser.id,
+                content: content
+            })
+        });
+        
+        input.value = '';
+        loadMessages();
+    } catch (error) {
+        console.error('Send message error:', error);
+        alert('Failed to send message');
+    }
+}
+
+// Allow Enter key to send message
+document.addEventListener('DOMContentLoaded', () => {
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+    }
+});
+
 init();
+requestNotificationPermission();
 setInterval(updateOnlineCount, 30000);
 </script>
 
