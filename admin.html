@@ -267,6 +267,20 @@
             background: white;
             color: #FF0000;
         }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #666;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -357,15 +371,17 @@
     <div class="tab-content" id="users">
         <div class="card">
             <h2>All Users</h2>
-            <table>
+            <div id="usersLoading" class="loading" style="display:none;">Loading users...</div>
+            <div id="usersError" class="error" style="display:none;"></div>
+            <table id="usersTableContainer" style="display:none;">
                 <thead>
                     <tr>
                         <th>Photo</th>
                         <th>Name</th>
                         <th>Age</th>
                         <th>Gender</th>
+                        <th>Telegram ID</th>
                         <th>Status</th>
-                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="usersTable"></tbody>
@@ -377,7 +393,8 @@
     <div class="tab-content" id="matches">
         <div class="card">
             <h2>All Matches</h2>
-            <table>
+            <div id="matchesLoading" class="loading" style="display:none;">Loading matches...</div>
+            <table id="matchesTableContainer" style="display:none;">
                 <thead>
                     <tr>
                         <th>User 1</th>
@@ -394,8 +411,9 @@
     <!-- Messages Tab -->
     <div class="tab-content" id="messages">
         <div class="card">
-            <h2>Recent Messages</h2>
-            <table>
+            <h2>Recent Messages (Last 50)</h2>
+            <div id="messagesLoading" class="loading" style="display:none;">Loading messages...</div>
+            <table id="messagesTableContainer" style="display:none;">
                 <thead>
                     <tr>
                         <th>From</th>
@@ -412,7 +430,7 @@
 
 <script>
 const API_URL = 'https://red-bunny-backend.onrender.com/api';
-const ADMIN_PASSWORD = 'redbunny2026'; // Change this!
+const ADMIN_PASSWORD = 'redbunny2026'; // CHANGE THIS!
 
 function login(e) {
     e.preventDefault();
@@ -450,27 +468,22 @@ function showTab(tabName) {
 
 async function loadDashboard() {
     try {
-        // Total users
         const usersRes = await fetch(`${API_URL}/users`);
         const users = await usersRes.json();
         document.getElementById('totalUsers').textContent = users.length;
         
-        // Active users (checked in)
         const checkinsRes = await fetch(`${API_URL}/checkins?is_active=true`);
         const checkins = await checkinsRes.json();
         document.getElementById('activeUsers').textContent = checkins.length;
         
-        // Total matches
         const matchesRes = await fetch(`${API_URL}/matches`);
         const matches = await matchesRes.json();
         document.getElementById('totalMatches').textContent = matches.length;
         
-        // Total messages
         const messagesRes = await fetch(`${API_URL}/messages`);
         const messages = await messagesRes.json();
         document.getElementById('totalMessages').textContent = messages.length;
         
-        // Recent activity
         let activity = '<table><thead><tr><th>Activity</th><th>Time</th></tr></thead><tbody>';
         messages.slice(-10).reverse().forEach(msg => {
             activity += `<tr><td>New message sent</td><td>${new Date(msg.created_at).toLocaleString()}</td></tr>`;
@@ -556,97 +569,170 @@ async function deleteEvent(eventId) {
 }
 
 async function loadUsers() {
+    const loadingEl = document.getElementById('usersLoading');
+    const errorEl = document.getElementById('usersError');
+    const tableEl = document.getElementById('usersTableContainer');
+    const bodyEl = document.getElementById('usersTable');
+    
+    loadingEl.style.display = 'block';
+    errorEl.style.display = 'none';
+    tableEl.style.display = 'none';
+    
     try {
+        console.log('Fetching users from:', `${API_URL}/users`);
         const response = await fetch(`${API_URL}/users`);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        }
+        
         const users = await response.json();
+        console.log('Users received:', users.length);
+        
+        if (!users || users.length === 0) {
+            errorEl.textContent = 'No users found in database';
+            errorEl.style.display = 'block';
+            loadingEl.style.display = 'none';
+            return;
+        }
         
         let html = '';
         for (const user of users) {
-            const photosRes = await fetch(`${API_URL}/photos?user_id=${user.id}&is_primary=true`);
-            const photos = await photosRes.json();
-            const photo = photos && photos[0] ? photos[0].photo_url : null;
-            
-            const checkinsRes = await fetch(`${API_URL}/checkins?user_id=${user.id}&is_active=true`);
-            const checkins = await checkinsRes.json();
-            const isActive = checkins && checkins.length > 0;
-            
-            html += `
-                <tr>
-                    <td>${photo ? `<img src="${photo}" class="user-avatar">` : '👤'}</td>
-                    <td>${user.name}</td>
-                    <td>${user.age}</td>
-                    <td>${user.gender}</td>
-                    <td>${isActive ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Offline</span>'}</td>
-                    <td><button class="btn btn-secondary" onclick="viewUser(${user.id})">View</button></td>
-                </tr>
-            `;
+            try {
+                // Safely get photo
+                let photo = null;
+                try {
+                    const photosRes = await fetch(`${API_URL}/photos?user_id=${user.id}&is_primary=true`);
+                    if (photosRes.ok) {
+                        const photos = await photosRes.json();
+                        photo = photos && photos[0] ? photos[0].photo_url : null;
+                    }
+                } catch (photoError) {
+                    console.warn('Photo fetch failed for user', user.id, photoError);
+                }
+                
+                // Safely get checkin status
+                let isActive = false;
+                try {
+                    const checkinsRes = await fetch(`${API_URL}/checkins?user_id=${user.id}&is_active=true`);
+                    if (checkinsRes.ok) {
+                        const checkins = await checkinsRes.json();
+                        isActive = checkins && checkins.length > 0;
+                    }
+                } catch (checkinError) {
+                    console.warn('Checkin fetch failed for user', user.id, checkinError);
+                }
+                
+                html += `
+                    <tr>
+                        <td>${photo ? `<img src="${photo}" class="user-avatar">` : '👤'}</td>
+                        <td>${user.name || '(No name)'}</td>
+                        <td>${user.age || '-'}</td>
+                        <td>${user.gender || '-'}</td>
+                        <td>${user.telegram_id || '-'}</td>
+                        <td>${isActive ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Offline</span>'}</td>
+                    </tr>
+                `;
+            } catch (userError) {
+                console.error('Error processing user', user.id, userError);
+            }
         }
         
-        document.getElementById('usersTable').innerHTML = html;
+        bodyEl.innerHTML = html;
+        loadingEl.style.display = 'none';
+        tableEl.style.display = 'table';
+        
     } catch (error) {
         console.error('Load users error:', error);
+        errorEl.textContent = `Error loading users: ${error.message}. Check console for details.`;
+        errorEl.style.display = 'block';
+        loadingEl.style.display = 'none';
     }
 }
 
-function viewUser(userId) {
-    alert(`User ID: ${userId}\nView full profile feature coming soon!`);
-}
-
 async function loadMatches() {
+    const loadingEl = document.getElementById('matchesLoading');
+    const tableEl = document.getElementById('matchesTableContainer');
+    const bodyEl = document.getElementById('matchesTable');
+    
+    loadingEl.style.display = 'block';
+    tableEl.style.display = 'none';
+    
     try {
         const response = await fetch(`${API_URL}/matches`);
         const matches = await response.json();
         
         let html = '';
         for (const match of matches) {
-            const user1Res = await fetch(`${API_URL}/users/${match.user1_id}`);
-            const user1 = await user1Res.json();
-            
-            const user2Res = await fetch(`${API_URL}/users/${match.user2_id}`);
-            const user2 = await user2Res.json();
-            
-            html += `
-                <tr>
-                    <td>${user1.name}, ${user1.age}</td>
-                    <td>${user2.name}, ${user2.age}</td>
-                    <td>${new Date(match.created_at).toLocaleDateString()}</td>
-                    <td><span class="badge badge-success">Active</span></td>
-                </tr>
-            `;
+            try {
+                const user1Res = await fetch(`${API_URL}/users/${match.user1_id}`);
+                const user1 = await user1Res.json();
+                
+                const user2Res = await fetch(`${API_URL}/users/${match.user2_id}`);
+                const user2 = await user2Res.json();
+                
+                html += `
+                    <tr>
+                        <td>${user1.name || 'User'} (${user1.age || '?'})</td>
+                        <td>${user2.name || 'User'} (${user2.age || '?'})</td>
+                        <td>${new Date(match.created_at).toLocaleString()}</td>
+                        <td><span class="badge badge-success">Active</span></td>
+                    </tr>
+                `;
+            } catch (matchError) {
+                console.error('Error processing match', match.id, matchError);
+            }
         }
         
-        document.getElementById('matchesTable').innerHTML = html;
+        bodyEl.innerHTML = html;
+        loadingEl.style.display = 'none';
+        tableEl.style.display = 'table';
     } catch (error) {
         console.error('Load matches error:', error);
+        loadingEl.innerHTML = `<div class="error">Error: ${error.message}</div>`;
     }
 }
 
 async function loadMessages() {
+    const loadingEl = document.getElementById('messagesLoading');
+    const tableEl = document.getElementById('messagesTableContainer');
+    const bodyEl = document.getElementById('messagesTable');
+    
+    loadingEl.style.display = 'block';
+    tableEl.style.display = 'none';
+    
     try {
         const response = await fetch(`${API_URL}/messages`);
         const messages = await response.json();
         
         let html = '';
         for (const msg of messages.slice(-50).reverse()) {
-            const senderRes = await fetch(`${API_URL}/users/${msg.sender_id}`);
-            const sender = await senderRes.json();
-            
-            const receiverRes = await fetch(`${API_URL}/users/${msg.receiver_id}`);
-            const receiver = await receiverRes.json();
-            
-            html += `
-                <tr>
-                    <td>${sender.name}</td>
-                    <td>${receiver.name}</td>
-                    <td>${msg.content.substring(0, 50)}${msg.content.length > 50 ? '...' : ''}</td>
-                    <td>${new Date(msg.created_at).toLocaleTimeString()}</td>
-                </tr>
-            `;
+            try {
+                const senderRes = await fetch(`${API_URL}/users/${msg.sender_id}`);
+                const sender = await senderRes.json();
+                
+                const receiverRes = await fetch(`${API_URL}/users/${msg.receiver_id}`);
+                const receiver = await receiverRes.json();
+                
+                html += `
+                    <tr>
+                        <td>${sender.name || 'User'}</td>
+                        <td>${receiver.name || 'User'}</td>
+                        <td>${msg.content.substring(0, 50)}${msg.content.length > 50 ? '...' : ''}</td>
+                        <td>${new Date(msg.created_at).toLocaleTimeString()}</td>
+                    </tr>
+                `;
+            } catch (msgError) {
+                console.error('Error processing message', msg.id, msgError);
+            }
         }
         
-        document.getElementById('messagesTable').innerHTML = html;
+        bodyEl.innerHTML = html;
+        loadingEl.style.display = 'none';
+        tableEl.style.display = 'table';
     } catch (error) {
         console.error('Load messages error:', error);
+        loadingEl.innerHTML = `<div class="error">Error: ${error.message}</div>`;
     }
 }
 
