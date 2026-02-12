@@ -382,6 +382,7 @@
                         <th>Gender</th>
                         <th>Telegram ID</th>
                         <th>Status</th>
+                        <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody id="usersTable"></tbody>
@@ -631,6 +632,9 @@ async function loadUsers() {
                         <td>${user.gender || '-'}</td>
                         <td>${user.telegram_id || '-'}</td>
                         <td>${isActive ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Offline</span>'}</td>
+                        <td>
+                            <button class="btn btn-danger" style="padding: 0.4rem 0.8rem; font-size: 0.85rem; margin-right: 0.5rem;" onclick="deleteUser(${user.id}, '${(user.name || 'User').replace(/'/g, "\\'")}')">Delete</button>
+                        </td>
                     </tr>
                 `;
             } catch (userError) {
@@ -733,6 +737,86 @@ async function loadMessages() {
     } catch (error) {
         console.error('Load messages error:', error);
         loadingEl.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+    }
+}
+
+async function deleteUser(userId, userName) {
+    if (!confirm(`⚠️ DELETE USER: ${userName}?\n\nThis will permanently remove:\n• User profile\n• All photos\n• All matches\n• All messages\n• All check-ins\n\nThis CANNOT be undone!\n\nAre you sure?`)) {
+        return;
+    }
+    
+    // Double confirmation for safety
+    if (!confirm(`FINAL WARNING!\n\nDelete ${userName} (ID: ${userId}) forever?\n\nType their name in your head to confirm.`)) {
+        return;
+    }
+    
+    try {
+        console.log('Deleting user:', userId);
+        
+        // Delete in order: photos, messages, matches, check-ins, then user
+        
+        // 1. Delete photos
+        try {
+            await fetch(`${API_URL}/photos?user_id=${userId}`, { 
+                method: 'DELETE' 
+            });
+            console.log('Photos deleted');
+        } catch (e) {
+            console.warn('Photo deletion failed:', e);
+        }
+        
+        // 2. Delete messages (as sender and receiver)
+        try {
+            const msgsRes = await fetch(`${API_URL}/messages?user_id=${userId}`);
+            const msgs = await msgsRes.json();
+            for (const msg of msgs) {
+                await fetch(`${API_URL}/messages/${msg.id}`, { method: 'DELETE' });
+            }
+            console.log('Messages deleted');
+        } catch (e) {
+            console.warn('Message deletion failed:', e);
+        }
+        
+        // 3. Delete matches
+        try {
+            const matchesRes = await fetch(`${API_URL}/matches?user_id=${userId}`);
+            const matches = await matchesRes.json();
+            for (const match of matches) {
+                await fetch(`${API_URL}/matches/${match.id}`, { method: 'DELETE' });
+            }
+            console.log('Matches deleted');
+        } catch (e) {
+            console.warn('Match deletion failed:', e);
+        }
+        
+        // 4. Delete check-ins
+        try {
+            const checkinsRes = await fetch(`${API_URL}/checkins?user_id=${userId}`);
+            const checkins = await checkinsRes.json();
+            for (const checkin of checkins) {
+                await fetch(`${API_URL}/checkins/${checkin.id}`, { method: 'DELETE' });
+            }
+            console.log('Check-ins deleted');
+        } catch (e) {
+            console.warn('Check-in deletion failed:', e);
+        }
+        
+        // 5. Delete user
+        const response = await fetch(`${API_URL}/users/${userId}`, { 
+            method: 'DELETE' 
+        });
+        
+        if (response.ok) {
+            alert(`✅ User "${userName}" has been permanently deleted!`);
+            loadUsers(); // Reload the table
+            loadDashboard(); // Update stats
+        } else {
+            throw new Error(`Failed to delete user: ${response.status}`);
+        }
+        
+    } catch (error) {
+        console.error('Delete user error:', error);
+        alert(`❌ Error deleting user: ${error.message}\n\nCheck console for details.`);
     }
 }
 
