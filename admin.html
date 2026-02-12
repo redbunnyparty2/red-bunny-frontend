@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Bunny - Admin Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f5f5f5;
+        }
+        
+        .login-screen {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .login-box {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+        }
+        
+        .login-box h1 {
+            text-align: center;
+            color: #FF0000;
+            margin-bottom: 0.5rem;
+        }
+        
+        .login-box p {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+        
+        .admin-container {
+            display: none;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .admin-header {
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .admin-header h1 {
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        
+        .tab {
+            padding: 1rem 2rem;
+            background: white;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+        
+        .tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .tab.active {
+            background: #FF0000;
+            color: white;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+        
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px;
+            text-align: center;
+        }
+        
+        .stat-card.red {
+            background: linear-gradient(135deg, #FF0000 0%, #CC0000 100%);
+        }
+        
+        .stat-card.green {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+        }
+        
+        .stat-card.orange {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+        }
+        
+        .stat-label {
+            font-size: 1rem;
+            opacity: 0.9;
+        }
+        
+        input, textarea, select {
+            width: 100%;
+            padding: 0.8rem;
+            margin-bottom: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+        }
+        
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #FF0000;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .btn {
+            padding: 0.8rem 2rem;
+            background: #FF0000;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s;
+        }
+        
+        .btn:hover {
+            background: #CC0000;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: #666;
+        }
+        
+        .btn-secondary:hover {
+            background: #444;
+        }
+        
+        .btn-danger {
+            background: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        th, td {
+            text-align: left;
+            padding: 1rem;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        th {
+            background: #f9f9f9;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f9f9f9;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+        
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-danger {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 2px solid white;
+        }
+        
+        .logout-btn:hover {
+            background: white;
+            color: #FF0000;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Screen -->
+<div class="login-screen" id="loginScreen">
+    <div class="login-box">
+        <h1>🐰 Red Bunny</h1>
+        <p>Admin Panel</p>
+        <form onsubmit="login(event)">
+            <label>Password</label>
+            <input type="password" id="adminPassword" placeholder="Enter admin password" required>
+            <button type="submit" class="btn" style="width: 100%; margin-top: 1rem;">Login</button>
+        </form>
+    </div>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin-container" id="adminPanel">
+    <div class="admin-header">
+        <h1>
+            <span>🐰</span>
+            Red Bunny Admin
+        </h1>
+        <button class="btn logout-btn" onclick="logout()">Logout</button>
+    </div>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="showTab('dashboard')">📊 Dashboard</div>
+        <div class="tab" onclick="showTab('events')">🎟️ Events</div>
+        <div class="tab" onclick="showTab('users')">👥 Users</div>
+        <div class="tab" onclick="showTab('matches')">💕 Matches</div>
+        <div class="tab" onclick="showTab('messages')">💬 Messages</div>
+    </div>
+    
+    <!-- Dashboard Tab -->
+    <div class="tab-content active" id="dashboard">
+        <div class="stats-grid">
+            <div class="stat-card red">
+                <div class="stat-number" id="totalUsers">0</div>
+                <div class="stat-label">Total Users</div>
+            </div>
+            <div class="stat-card green">
+                <div class="stat-number" id="activeUsers">0</div>
+                <div class="stat-label">Active Now</div>
+            </div>
+            <div class="stat-card orange">
+                <div class="stat-number" id="totalMatches">0</div>
+                <div class="stat-label">Total Matches</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="totalMessages">0</div>
+                <div class="stat-label">Messages Sent</div>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Recent Activity</h2>
+            <div id="recentActivity"></div>
+        </div>
+    </div>
+    
+    <!-- Events Tab -->
+    <div class="tab-content" id="events">
+        <div class="card">
+            <h2>Create New Event</h2>
+            <form onsubmit="createEvent(event)">
+                <label>Event Title</label>
+                <input type="text" id="eventTitle" placeholder="Red Bunny Singles Night" required>
+                
+                <label>Date & Time</label>
+                <input type="datetime-local" id="eventDate" required>
+                
+                <label>Description</label>
+                <textarea id="eventDescription" rows="4" placeholder="Join us for an amazing night..."></textarea>
+                
+                <button type="submit" class="btn">Create Event</button>
+            </form>
+        </div>
+        
+        <div class="card">
+            <h2>All Events</h2>
+            <div id="eventsList"></div>
+        </div>
+    </div>
+    
+    <!-- Users Tab -->
+    <div class="tab-content" id="users">
+        <div class="card">
+            <h2>All Users</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Photo</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTable"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Matches Tab -->
+    <div class="tab-content" id="matches">
+        <div class="card">
+            <h2>All Matches</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User 1</th>
+                        <th>User 2</th>
+                        <th>Matched On</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody id="matchesTable"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Messages Tab -->
+    <div class="tab-content" id="messages">
+        <div class="card">
+            <h2>Recent Messages</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>From</th>
+                        <th>To</th>
+                        <th>Message</th>
+                        <th>Time</th>
+                    </tr>
+                </thead>
+                <tbody id="messagesTable"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script>
+const API_URL = 'https://red-bunny-backend.onrender.com/api';
+const ADMIN_PASSWORD = 'redbunny2026'; // Change this!
+
+function login(e) {
+    e.preventDefault();
+    const password = document.getElementById('adminPassword').value;
+    
+    if (password === ADMIN_PASSWORD) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        localStorage.setItem('admin_logged_in', 'true');
+        loadDashboard();
+    } else {
+        alert('Incorrect password!');
+    }
+}
+
+function logout() {
+    localStorage.removeItem('admin_logged_in');
+    document.getElementById('loginScreen').style.display = 'flex';
+    document.getElementById('adminPanel').style.display = 'none';
+}
+
+function showTab(tabName) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(tabName).classList.add('active');
+    
+    if (tabName === 'dashboard') loadDashboard();
+    if (tabName === 'events') loadEvents();
+    if (tabName === 'users') loadUsers();
+    if (tabName === 'matches') loadMatches();
+    if (tabName === 'messages') loadMessages();
+}
+
+async function loadDashboard() {
+    try {
+        // Total users
+        const usersRes = await fetch(`${API_URL}/users`);
+        const users = await usersRes.json();
+        document.getElementById('totalUsers').textContent = users.length;
+        
+        // Active users (checked in)
+        const checkinsRes = await fetch(`${API_URL}/checkins?is_active=true`);
+        const checkins = await checkinsRes.json();
+        document.getElementById('activeUsers').textContent = checkins.length;
+        
+        // Total matches
+        const matchesRes = await fetch(`${API_URL}/matches`);
+        const matches = await matchesRes.json();
+        document.getElementById('totalMatches').textContent = matches.length;
+        
+        // Total messages
+        const messagesRes = await fetch(`${API_URL}/messages`);
+        const messages = await messagesRes.json();
+        document.getElementById('totalMessages').textContent = messages.length;
+        
+        // Recent activity
+        let activity = '<table><thead><tr><th>Activity</th><th>Time</th></tr></thead><tbody>';
+        messages.slice(-10).reverse().forEach(msg => {
+            activity += `<tr><td>New message sent</td><td>${new Date(msg.created_at).toLocaleString()}</td></tr>`;
+        });
+        activity += '</tbody></table>';
+        document.getElementById('recentActivity').innerHTML = activity;
+    } catch (error) {
+        console.error('Dashboard error:', error);
+    }
+}
+
+async function createEvent(e) {
+    e.preventDefault();
+    
+    const title = document.getElementById('eventTitle').value;
+    const date = document.getElementById('eventDate').value;
+    const description = document.getElementById('eventDescription').value;
+    
+    try {
+        await fetch(`${API_URL}/events`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                title,
+                event_date: date,
+                description
+            })
+        });
+        
+        alert('Event created! ✅');
+        document.getElementById('eventTitle').value = '';
+        document.getElementById('eventDate').value = '';
+        document.getElementById('eventDescription').value = '';
+        loadEvents();
+    } catch (error) {
+        console.error('Create event error:', error);
+        alert('Failed to create event');
+    }
+}
+
+async function loadEvents() {
+    try {
+        const response = await fetch(`${API_URL}/events`);
+        const events = await response.json();
+        
+        let html = '<table><thead><tr><th>Title</th><th>Date</th><th>Attendees</th><th>Actions</th></tr></thead><tbody>';
+        
+        for (const event of events) {
+            const date = new Date(event.event_date);
+            const rsvpRes = await fetch(`${API_URL}/event-rsvps?event_id=${event.id}`);
+            const rsvps = await rsvpRes.json();
+            
+            html += `
+                <tr>
+                    <td><strong>${event.title}</strong></td>
+                    <td>${date.toLocaleDateString()} ${date.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</td>
+                    <td><span class="badge badge-success">${rsvps.length} attending</span></td>
+                    <td>
+                        <button class="btn btn-danger" onclick="deleteEvent(${event.id})">Delete</button>
+                    </td>
+                </tr>
+            `;
+        }
+        
+        html += '</tbody></table>';
+        document.getElementById('eventsList').innerHTML = html;
+    } catch (error) {
+        console.error('Load events error:', error);
+    }
+}
+
+async function deleteEvent(eventId) {
+    if (!confirm('Delete this event?')) return;
+    
+    try {
+        await fetch(`${API_URL}/events/${eventId}`, { method: 'DELETE' });
+        alert('Event deleted!');
+        loadEvents();
+    } catch (error) {
+        console.error('Delete event error:', error);
+        alert('Failed to delete event');
+    }
+}
+
+async function loadUsers() {
+    try {
+        const response = await fetch(`${API_URL}/users`);
+        const users = await response.json();
+        
+        let html = '';
+        for (const user of users) {
+            const photosRes = await fetch(`${API_URL}/photos?user_id=${user.id}&is_primary=true`);
+            const photos = await photosRes.json();
+            const photo = photos && photos[0] ? photos[0].photo_url : null;
+            
+            const checkinsRes = await fetch(`${API_URL}/checkins?user_id=${user.id}&is_active=true`);
+            const checkins = await checkinsRes.json();
+            const isActive = checkins && checkins.length > 0;
+            
+            html += `
+                <tr>
+                    <td>${photo ? `<img src="${photo}" class="user-avatar">` : '👤'}</td>
+                    <td>${user.name}</td>
+                    <td>${user.age}</td>
+                    <td>${user.gender}</td>
+                    <td>${isActive ? '<span class="badge badge-success">Active</span>' : '<span class="badge badge-danger">Offline</span>'}</td>
+                    <td><button class="btn btn-secondary" onclick="viewUser(${user.id})">View</button></td>
+                </tr>
+            `;
+        }
+        
+        document.getElementById('usersTable').innerHTML = html;
+    } catch (error) {
+        console.error('Load users error:', error);
+    }
+}
+
+function viewUser(userId) {
+    alert(`User ID: ${userId}\nView full profile feature coming soon!`);
+}
+
+async function loadMatches() {
+    try {
+        const response = await fetch(`${API_URL}/matches`);
+        const matches = await response.json();
+        
+        let html = '';
+        for (const match of matches) {
+            const user1Res = await fetch(`${API_URL}/users/${match.user1_id}`);
+            const user1 = await user1Res.json();
+            
+            const user2Res = await fetch(`${API_URL}/users/${match.user2_id}`);
+            const user2 = await user2Res.json();
+            
+            html += `
+                <tr>
+                    <td>${user1.name}, ${user1.age}</td>
+                    <td>${user2.name}, ${user2.age}</td>
+                    <td>${new Date(match.created_at).toLocaleDateString()}</td>
+                    <td><span class="badge badge-success">Active</span></td>
+                </tr>
+            `;
+        }
+        
+        document.getElementById('matchesTable').innerHTML = html;
+    } catch (error) {
+        console.error('Load matches error:', error);
+    }
+}
+
+async function loadMessages() {
+    try {
+        const response = await fetch(`${API_URL}/messages`);
+        const messages = await response.json();
+        
+        let html = '';
+        for (const msg of messages.slice(-50).reverse()) {
+            const senderRes = await fetch(`${API_URL}/users/${msg.sender_id}`);
+            const sender = await senderRes.json();
+            
+            const receiverRes = await fetch(`${API_URL}/users/${msg.receiver_id}`);
+            const receiver = await receiverRes.json();
+            
+            html += `
+                <tr>
+                    <td>${sender.name}</td>
+                    <td>${receiver.name}</td>
+                    <td>${msg.content.substring(0, 50)}${msg.content.length > 50 ? '...' : ''}</td>
+                    <td>${new Date(msg.created_at).toLocaleTimeString()}</td>
+                </tr>
+            `;
+        }
+        
+        document.getElementById('messagesTable').innerHTML = html;
+    } catch (error) {
+        console.error('Load messages error:', error);
+    }
+}
+
+// Check if already logged in
+if (localStorage.getItem('admin_logged_in') === 'true') {
+    document.getElementById('loginScreen').style.display = 'none';
+    document.getElementById('adminPanel').style.display = 'block';
+    loadDashboard();
+}
+</script>
+
+</body>
+</html>
